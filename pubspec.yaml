@@ -18,6 +18,7 @@ dependencies:
   #file_picker: any
   #get_it: any
   #dio: any
+  flutter_staggered_grid_view: any
   sqflite: any
   get_storage: any
   get: any

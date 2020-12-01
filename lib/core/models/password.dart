@@ -53,20 +53,18 @@ class PasswordModel {
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return (id == null)
-        ? {
-            'title': this.title,
-            'imageName': this.imageName,
-            'password': this.password,
-          }
-        : {
-            'id': this.id,
-            'title': this.title,
-            'imageName': this.imageName,
-            'password': this.password,
-          };
-  }
+  Map<String, dynamic> toMap() => (id == null)
+      ? {
+          'title': this.title,
+          'imageName': this.imageName,
+          'password': this.password,
+        }
+      : {
+          'id': this.id,
+          'title': this.title,
+          'imageName': this.imageName,
+          'password': this.password,
+        };
 }
 
 /*
