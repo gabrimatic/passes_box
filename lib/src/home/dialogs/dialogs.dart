@@ -151,6 +151,8 @@ Future<void> passwordDialog({
                   TextFormField(
                     controller: titleC,
                     maxLength: 64,
+                    textInputAction: TextInputAction.next,
+                    keyboardType: TextInputType.url,
                     decoration: const InputDecoration(
                       counterText: '',
                       labelText: 'Title',
@@ -162,6 +164,8 @@ Future<void> passwordDialog({
                   TextFormField(
                     controller: usernameC,
                     maxLength: 64,
+                    textInputAction: TextInputAction.next,
+                    keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
                       counterText: '',
                       labelText: 'Username',
@@ -173,6 +177,8 @@ Future<void> passwordDialog({
                   TextFormField(
                     controller: passwordC,
                     maxLength: 64,
+                    textInputAction: TextInputAction.done,
+                    keyboardType: TextInputType.visiblePassword,
                     decoration: InputDecoration(
                       counterText: '',
                       labelText: 'Password',
@@ -210,9 +216,7 @@ Future<void> passwordDialog({
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               icon: const Icon(Icons.save_rounded),
               onPressed: () async {
-                if (titleC.text.isEmpty ||
-                    passwordC.text.isEmpty ||
-                    usernameC.text.isEmpty) return;
+                if (passwordC.text.isEmpty) return;
 
                 if (model == null) {
                   final passwordModel = PasswordModel(
@@ -221,8 +225,6 @@ Future<void> passwordDialog({
                     username: usernameC.text,
                     imageName: imageName,
                   );
-                  await PassesDB.insert(passwordModel);
-
                   Get.context!.read<HomeCubit>().addPassword(passwordModel);
                 } else {
                   final passwordModel = PasswordModel(
@@ -232,9 +234,9 @@ Future<void> passwordDialog({
                     username: usernameC.text,
                     imageName: imageName,
                   );
-                  await PassesDB.update(passwordModel);
                   Get.context!.read<HomeCubit>().updatePassword(passwordModel);
                 }
+
                 Get.back(closeOverlays: true);
               },
             ),
@@ -258,7 +260,7 @@ Future<void> deleteDialog(
 ) =>
     Get.defaultDialog(
       title: 'Delete',
-      content: Text('Are you sure to delete "${model.title}"?'),
+      content: Text('Are you sure to delete the "${model.title}"?'),
       textConfirm: 'Delete',
       confirmTextColor: Colors.white,
       onConfirm: () async {
@@ -330,9 +332,16 @@ Future<void> deleteDialog(
 //     );
 
 Future<void> settings() async {
+  final localAuth = LocalAuthentication();
+  final canUseAuth = (await localAuth.canCheckBiometrics) &&
+      (await localAuth.getAvailableBiometrics()).isNotEmpty;
+
+  bool hasAuth = false;
   const storage = FlutterSecureStorage();
-  final auth = await storage.read(key: 'auth');
-  final hasAuth = auth != null;
+  if (canUseAuth) {
+    final auth = await storage.read(key: 'auth');
+    hasAuth = auth != null;
+  }
 
   await Get.bottomSheet(
     Column(
@@ -340,14 +349,16 @@ Future<void> settings() async {
       children: [
         ListTile(
           title: const Text('Authentication'),
-          leading: const Icon(
+          leading: Icon(
             Icons.fingerprint_rounded,
-            color: appColor3,
+            color: canUseAuth ? appColor3 : null,
           ),
-          subtitle: hasAuth
-              ? const Text('PassesBox uses biometric auth.')
-              : const Text('Tap here to active biometric auth...'),
-          trailing: hasAuth
+          subtitle: canUseAuth
+              ? (hasAuth
+                  ? const Text('PassesBox is using biometric auth.')
+                  : const Text('Tap here to active biometric auth.'))
+              : const Text('Your device does not support biometric auth.'),
+          trailing: (canUseAuth && hasAuth)
               ? IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () async {
@@ -356,18 +367,24 @@ Future<void> settings() async {
                   },
                 )
               : null,
-          onTap: hasAuth ? null : authenticate,
+          onTap: (canUseAuth && hasAuth) ? _authenticate : null,
         ),
         const Divider(),
         const ListTile(
           title: Text('Backup'),
-          leading: Icon(Icons.backup),
+          leading: Icon(
+            Icons.backup_outlined,
+            color: appColor3,
+          ),
           onTap: backup,
         ),
         const Divider(),
         const ListTile(
           title: Text('Restore'),
-          leading: Icon(Icons.restore),
+          leading: Icon(
+            Icons.restore,
+            color: appColor3,
+          ),
           onTap: restore,
         ),
         const Divider(),
@@ -401,10 +418,8 @@ Future<void> settings() async {
   );
 }
 
-Future<void> authenticate() async {
+Future<void> _authenticate() async {
   final localAuth = LocalAuthentication();
-
-  if (!(await localAuth.canCheckBiometrics)) return;
 
   final didAuthenticate = await localAuth.authenticate(
     localizedReason: 'Please authenticate to enable biometric auth.',

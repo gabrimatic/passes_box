@@ -12,7 +12,7 @@ class PassesBoxApp extends StatelessWidget {
         create: (context) => HomeCubit()..loadAll(),
         child: GetMaterialApp(
           home: SplashPage(),
-          title: 'Passes Box',
+          title: 'PassesBox',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             fontFamily: 'raleway',

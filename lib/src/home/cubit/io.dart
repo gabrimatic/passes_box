@@ -1,15 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:android_path_provider/android_path_provider.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../core/models/password.dart';
+import '../../../core/widgets/widgets.dart';
 import '../../../repository/db.dart';
 import 'home_cubit.dart';
 
@@ -33,9 +34,7 @@ Future<void> backup() async {
   );
 
   final dir = Directory(
-    join(
-      (await getExternalStorageDirectory())!.path,
-    ),
+    (await AndroidPathProvider.downloadsPath),
   )..createSync(
       recursive: true,
     );
@@ -52,6 +51,8 @@ Future<void> backup() async {
   Get.back(
     closeOverlays: true,
   );
+
+  appShowSnackbar(message: 'Backup file saved in the /Download directory.');
 }
 
 Future<void> restore() async {
@@ -92,4 +93,6 @@ Future<void> restore() async {
   Get.back(
     closeOverlays: true,
   );
+
+  appShowSnackbar(message: 'All passwords have successfully restored!');
 }

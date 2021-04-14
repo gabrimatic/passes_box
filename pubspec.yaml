@@ -8,7 +8,7 @@ environment:
   sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
-  path_provider: any
+  android_path_provider: any
   flutter_bloc: any
   file_picker: any
   permission_handler: any
@@ -36,7 +36,7 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/images/icons/logo_back.jpg"
+  image_path: "assets/images/icons/logo_trans.png"
 
 flutter:
   uses-material-design: true

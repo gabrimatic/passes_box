@@ -35,7 +35,11 @@ class _HomePageState extends State<HomePage> {
                     ),
                     elevation: 2,
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
+                      padding: const EdgeInsets.only(
+                        top: 8,
+                        left: 8,
+                        right: 8,
+                      ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,13 +76,44 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               const Spacer(),
-                              IconButton(
-                                icon: const Icon(Icons.copy),
-                                color: appColor2,
-                                onPressed: () => Clipboard.setData(
-                                  ClipboardData(
-                                      text: state.passesList[index].password),
+                              PopupMenuButton(
+                                icon: const Icon(
+                                  Icons.more_vert,
+                                  color: appColor3,
                                 ),
+                                itemBuilder: (context) {
+                                  return <PopupMenuEntry>[
+                                    const PopupMenuItem<String>(
+                                      value: 'username',
+                                      child: Text(
+                                        'Copy Username',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: appColor3,
+                                        ),
+                                      ),
+                                    ),
+                                    const PopupMenuItem<String>(
+                                      value: 'pass',
+                                      child: Text(
+                                        'Copy Password',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: appColor3,
+                                        ),
+                                      ),
+                                    ),
+                                  ];
+                                },
+                                onSelected: (value) {
+                                  Clipboard.setData(
+                                    ClipboardData(
+                                      text: value == 'pass'
+                                          ? state.passesList[index].password
+                                          : state.passesList[index].username,
+                                    ),
+                                  );
+                                },
                               ),
                             ],
                           )
@@ -102,10 +137,11 @@ class _HomePageState extends State<HomePage> {
                       mainAxisSize: MainAxisSize.min,
                       children: const [
                         Text(
-                          'ADD YOUR FIRST PASSWORD !',
+                          'ADD YOUR FIRST PASSWORD!',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.black,
+                            letterSpacing: 1,
                           ),
                         ),
                         Icon(
