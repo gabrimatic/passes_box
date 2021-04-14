@@ -18,12 +18,14 @@ Future<void> passwordDialog({
   PasswordModel? model,
 }) async {
   final titleC = TextEditingController();
+  final usernameC = TextEditingController();
   final passwordC = TextEditingController();
   String? imageName = 'social';
 
   if (model != null) {
     titleC.text = model.title!;
     passwordC.text = model.password!;
+    usernameC.text = model.username!;
     imageName = model.imageName;
   }
 
@@ -158,6 +160,17 @@ Future<void> passwordDialog({
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
+                    controller: usernameC,
+                    maxLength: 64,
+                    decoration: const InputDecoration(
+                      counterText: '',
+                      labelText: 'Username',
+                      icon: Icon(Icons.person),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
                     controller: passwordC,
                     maxLength: 64,
                     decoration: InputDecoration(
@@ -197,12 +210,15 @@ Future<void> passwordDialog({
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               icon: const Icon(Icons.save_rounded),
               onPressed: () async {
-                if (titleC.text.isEmpty || passwordC.text.isEmpty) return;
+                if (titleC.text.isEmpty ||
+                    passwordC.text.isEmpty ||
+                    usernameC.text.isEmpty) return;
 
                 if (model == null) {
                   final passwordModel = PasswordModel(
                     title: titleC.text,
                     password: passwordC.text,
+                    username: usernameC.text,
                     imageName: imageName,
                   );
                   await PassesDB.insert(passwordModel);
@@ -213,6 +229,7 @@ Future<void> passwordDialog({
                     id: model.id,
                     title: titleC.text,
                     password: passwordC.text,
+                    username: usernameC.text,
                     imageName: imageName,
                   );
                   await PassesDB.update(passwordModel);

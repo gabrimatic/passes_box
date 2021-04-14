@@ -1,6 +1,7 @@
 class PasswordModel {
   int? id;
   String? title;
+  String? username;
   String? imageName;
   String? password;
 
@@ -8,6 +9,7 @@ class PasswordModel {
     this.id,
     this.title,
     this.imageName,
+    this.username,
     this.password,
   });
 
@@ -15,12 +17,14 @@ class PasswordModel {
     int? id,
     String? title,
     String? imageName,
+    String? username,
     String? password,
   }) {
     return PasswordModel(
       id: id ?? this.id,
       title: title ?? this.title,
       imageName: imageName ?? this.imageName,
+      username: username ?? this.username,
       password: password ?? this.password,
     );
   }
@@ -31,6 +35,7 @@ class PasswordModel {
       title: map['title'] as String?,
       imageName: map['imageName'] as String?,
       password: map['password'] as String?,
+      username: map['username'] as String?,
     );
   }
 
@@ -38,11 +43,13 @@ class PasswordModel {
       ? {
           'title': title,
           'imageName': imageName,
+          'username': username,
           'password': password,
         }
       : {
           'id': id,
           'title': title,
+          'username': username,
           'imageName': imageName,
           'password': password,
         };

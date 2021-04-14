@@ -19,7 +19,7 @@ Future<void> appOpenDatabase() async {
 class PassesDB {
   static const _tableName = 'passwordsTB';
   static const createSQL =
-      'CREATE TABLE "$_tableName" ("id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "title" TEXT NOT NULL, "imageName" TEXT NOT NULL, "password"	TEXT NOT NULL);';
+      'CREATE TABLE "$_tableName" ("id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "title" TEXT NOT NULL, "imageName" TEXT NOT NULL, "username"	TEXT NOT NULL, "password"	TEXT NOT NULL);';
 
   static Future<int> insert(PasswordModel model) => appDB.insert(
         _tableName,

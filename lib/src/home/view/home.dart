@@ -49,9 +49,9 @@ class _HomePageState extends State<HomePage> {
                             title: Text(
                               state.passesList[index].title!,
                             ),
-                            /*subtitle: Text(
-                              _filteredList[index].password,
-                            ),*/
+                            subtitle: Text(
+                              state.passesList[index].username!,
+                            ),
                           ),
                           const Divider(),
                           Row(

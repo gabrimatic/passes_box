@@ -26,7 +26,9 @@ class _SplashPageState extends State<SplashPage> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        vertical: 20, horizontal: 64),
+                      vertical: 20,
+                      horizontal: 84,
+                    ),
                     child: Image.asset('assets/images/icons/logo_trans.png'),
                   ),
                   const Text(
@@ -66,7 +68,7 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   void _config() {
-    Timer.periodic(const Duration(milliseconds: 1400), (timer) {
+    Timer.periodic(const Duration(milliseconds: 1150), (timer) {
       timer.cancel();
       _authenticate();
     });
