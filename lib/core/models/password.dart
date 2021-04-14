@@ -1,8 +1,8 @@
 class PasswordModel {
-  int id;
-  String title;
-  String imageName;
-  String password;
+  int? id;
+  String? title;
+  String? imageName;
+  String? password;
 
   PasswordModel({
     this.id,
@@ -12,12 +12,12 @@ class PasswordModel {
   });
 
   PasswordModel copyWith({
-    int id,
-    String title,
-    String imageName,
-    String password,
+    int? id,
+    String? title,
+    String? imageName,
+    String? password,
   }) {
-    return new PasswordModel(
+    return PasswordModel(
       id: id ?? this.id,
       title: title ?? this.title,
       imageName: imageName ?? this.imageName,
@@ -25,45 +25,26 @@ class PasswordModel {
     );
   }
 
-  @override
-  String toString() {
-    return 'PasswordModel{id: $id, title: $title, imageName: $imageName, password: $password}';
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is PasswordModel &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          title == other.title &&
-          imageName == other.imageName &&
-          password == other.password);
-
-  @override
-  int get hashCode =>
-      id.hashCode ^ title.hashCode ^ imageName.hashCode ^ password.hashCode;
-
   factory PasswordModel.fromMap(Map<String, dynamic> map) {
-    return new PasswordModel(
-      id: map['id'] as int,
-      title: map['title'] as String,
-      imageName: map['imageName'] as String,
-      password: map['password'] as String,
+    return PasswordModel(
+      id: map['id'] as int?,
+      title: map['title'] as String?,
+      imageName: map['imageName'] as String?,
+      password: map['password'] as String?,
     );
   }
 
   Map<String, dynamic> toMap() => (id == null)
       ? {
-          'title': this.title,
-          'imageName': this.imageName,
-          'password': this.password,
+          'title': title,
+          'imageName': imageName,
+          'password': password,
         }
       : {
-          'id': this.id,
-          'title': this.title,
-          'imageName': this.imageName,
-          'password': this.password,
+          'id': id,
+          'title': title,
+          'imageName': imageName,
+          'password': password,
         };
 }
 

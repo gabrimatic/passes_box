@@ -1,15 +1,19 @@
-import 'package:passes_box/core/models/password.dart';
 import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_sqlcipher/sqflite.dart';
+
+import '../core/models/password.dart';
 
 const appDBName = 'passesDB.db';
-Database appDB;
+late Database appDB;
 
 Future<void> appOpenDatabase() async {
-  appDB = await openDatabase((join((await getDatabasesPath()), appDBName)),
-      onCreate: (database, _) async {
-    await database.execute(PassesDB.createSQL);
-  }, version: 1);
+  appDB = await openDatabase(
+    join(await getDatabasesPath(), appDBName),
+    onCreate: (database, _) async {
+      await database.execute(PassesDB.createSQL);
+    },
+    version: 1,
+  );
 }
 
 class PassesDB {
@@ -17,36 +21,46 @@ class PassesDB {
   static const createSQL =
       'CREATE TABLE "$_tableName" ("id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "title" TEXT NOT NULL, "imageName" TEXT NOT NULL, "password"	TEXT NOT NULL);';
 
-  static Future<int> insert(PasswordModel model) async =>
-      (await appDB.insert(_tableName, model.toMap(),
-          conflictAlgorithm: ConflictAlgorithm.replace));
+  static Future<int> insert(PasswordModel model) => appDB.insert(
+        _tableName,
+        model.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
 
-  static Future<int> update(PasswordModel model) async =>
-      (await appDB.update(_tableName, model.toMap(),
-          conflictAlgorithm: ConflictAlgorithm.replace,
-          where: 'id = ?',
-          whereArgs: [model.id]));
+  static Future<int> update(PasswordModel model) => appDB.update(
+        _tableName,
+        model.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+        where: 'id = ?',
+        whereArgs: [model.id],
+      );
 
   static Future<PasswordModel> select(num id) async {
-    var row = await appDB.query(_tableName, where: 'id = ?', whereArgs: [id]);
-    return (row == null || row.isEmpty || row.first.isEmpty)
+    final row = await appDB.query(_tableName, where: 'id = ?', whereArgs: [id]);
+    return (row.isEmpty || row.first.isEmpty)
         ? PasswordModel()
         : PasswordModel.fromMap(row.first);
   }
 
   static Future<List<PasswordModel>> selectAll() async {
-    var list = List<PasswordModel>();
-    (await appDB.query(_tableName))
-        .forEach((element) => list.add(PasswordModel.fromMap(element)));
+    final list = <PasswordModel>[];
+    (await appDB.query(_tableName)).forEach(
+      (element) => list.add(
+        PasswordModel.fromMap(element),
+      ),
+    );
     return list;
   }
 
   static Future<int> getCount() async => (await appDB.query(_tableName)).length;
 
-  static Future<int> deleteAll() async => await appDB.delete(_tableName);
+  static Future<int> deleteAll() => appDB.delete(_tableName);
 
-  static Future<int> delete(num id) async =>
-      await appDB.delete(_tableName, where: 'id = ?', whereArgs: [id]);
+  static Future<int> delete(int id) => appDB.delete(
+        _tableName,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
 }
 
 /*import 'package:flutter/foundation.dart';

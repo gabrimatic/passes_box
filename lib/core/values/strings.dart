@@ -1,7 +1,7 @@
 const appName = 'Passes Box';
 const appVersion = '0.0.9 beta';
-const appAbout =
-    """Passes Box developed to helps you in managing all your passwords.
+const appAbout = """
+Passes Box developed to helps you in managing all your passwords.
 
 Everyone has a lot of accounts on social media, emails, credit cards, etc. It is difficult to have a unique, complex, and secure password and remember all of them at the same time!
 

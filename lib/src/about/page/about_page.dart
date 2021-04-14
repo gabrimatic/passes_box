@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:passes_box/core/values/colors.dart';
-import 'package:passes_box/core/values/strings.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../../core/values/colors.dart';
+import '../../../core/values/strings.dart';
 
 class AboutPage extends StatelessWidget {
   @override
@@ -40,49 +41,42 @@ class AboutPage extends StatelessWidget {
           child: Column(
             children: [
               Align(
-                  alignment: Alignment.topRight,
-                  child: IconButton(
-                    icon: Icon(Icons.close),
-                    onPressed: () => Get.back(),
-                  )),
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Get.back(),
+                ),
+              ),
               Image.asset(
                 'assets/images/icons/logo_trans.png',
                 width: Get.width / 2,
               ),
-              SizedBox(
-                height: 16,
-              ),
-              Text(
+              const SizedBox(height: 16),
+              const Text(
                 appName,
                 style: TextStyle(color: appColor2, fontSize: 24),
               ),
-              SizedBox(
-                height: 16,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+              const SizedBox(height: 16),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
                   appAbout,
                   textAlign: TextAlign.justify,
                   style: TextStyle(fontSize: 16),
                 ),
               ),
-              SizedBox(
-                height: 8,
-              ),
-              Divider(),
+              const SizedBox(height: 8),
+              const Divider(),
               ListTile(
-                title: Text('By Hossein Yousefpour'),
-                subtitle: Text('version $appVersion'),
+                title: const Text('By Hossein Yousefpour'),
+                subtitle: const Text('version $appVersion'),
                 trailing: IconButton(
-                  icon: Icon(Icons.public),
+                  icon: const Icon(Icons.public),
                   color: appColor2,
                   onPressed: () => launch('https://gabrimatic.info'),
                 ),
               ),
-              SizedBox(
-                height: 16,
-              ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
