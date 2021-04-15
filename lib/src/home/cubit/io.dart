@@ -4,15 +4,11 @@ import 'dart:io';
 import 'package:android_path_provider/android_path_provider.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
 import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'package:passes_box/core/index.dart' hide Key;
 import '../../../core/models/password.dart';
-import '../../../core/widgets/widgets.dart';
-import '../../../repository/db.dart';
-import 'home_cubit.dart';
 
 final _key = Key.fromUtf8('sI8J0Mb5Aj4jJd5Pv5Ng9U756fq5lLiI');
 final _iv = IV.fromLength(16);

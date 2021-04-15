@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:passes_box/core/values/colors.dart';
+import 'package:passes_box/core/index.dart';
 
 void appShowSnackbar({required String message}) => Get.showSnackbar(
       GetBar(

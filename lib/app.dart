@@ -1,9 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
-
-import 'core/values/colors.dart';
-import 'src/home/cubit/home_cubit.dart';
+import 'core/index.dart';
 import 'src/splash/view/page.dart';
 
 class PassesBoxApp extends StatelessWidget {

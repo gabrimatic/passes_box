@@ -1,5 +1,5 @@
 import 'package:path/path.dart';
-import 'package:sqflite_sqlcipher/sqflite.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../core/models/password.dart';
 

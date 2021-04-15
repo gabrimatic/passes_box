@@ -1,13 +1,7 @@
-import 'dart:async';
-
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-
-import '../../../core/values/colors.dart';
-import '../cubit/home_cubit.dart';
-import '../dialogs/dialogs.dart';
+import 'package:passes_box/core/index.dart';
+import 'package:passes_box/src/home/dialogs/dialogs.dart';
 
 class HomePage extends StatefulWidget {
   @override

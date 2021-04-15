@@ -1,9 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:passes_box/core/index.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../../../core/values/colors.dart';
-import '../../../core/values/strings.dart';
 
 class AboutPage extends StatelessWidget {
   @override
@@ -48,7 +44,7 @@ class AboutPage extends StatelessWidget {
                 ),
               ),
               Image.asset(
-                'assets/images/icons/logo_trans.png',
+                'assets/images/logo.png',
                 width: Get.width / 2,
               ),
               const SizedBox(height: 16),

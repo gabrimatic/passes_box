@@ -1,17 +1,6 @@
-import 'dart:async';
-import 'dart:math';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:get/get.dart';
-import 'package:local_auth/local_auth.dart';
-
+import '../../../core/index.dart';
 import '../../../core/models/password.dart';
-import '../../../core/values/colors.dart';
-import '../../../repository/db.dart';
 import '../../about/page/about_page.dart';
-import '../cubit/home_cubit.dart';
 import '../cubit/io.dart';
 
 Future<void> passwordDialog({
@@ -332,7 +321,6 @@ Future<void> deleteDialog(
 //     );
 
 Future<void> settings() async {
-  final localAuth = LocalAuthentication();
   final canUseAuth = (await localAuth.canCheckBiometrics) &&
       (await localAuth.getAvailableBiometrics()).isNotEmpty;
 
@@ -367,7 +355,7 @@ Future<void> settings() async {
                   },
                 )
               : null,
-          onTap: (canUseAuth && hasAuth) ? _authenticate : null,
+          onTap: (canUseAuth && !hasAuth) ? _authenticate : null,
         ),
         const Divider(),
         const ListTile(
@@ -419,8 +407,6 @@ Future<void> settings() async {
 }
 
 Future<void> _authenticate() async {
-  final localAuth = LocalAuthentication();
-
   final didAuthenticate = await localAuth.authenticate(
     localizedReason: 'Please authenticate to enable biometric auth.',
     biometricOnly: true,

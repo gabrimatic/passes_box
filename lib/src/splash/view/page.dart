@@ -1,13 +1,5 @@
-import 'dart:async';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:get/get.dart';
-import 'package:local_auth/local_auth.dart';
-
-import '../../../core/values/colors.dart';
-import '../../../core/values/strings.dart';
-import '../../home/view/home.dart';
+import 'package:passes_box/core/index.dart';
+import 'package:passes_box/src/home/view/home.dart';
 
 class SplashPage extends StatefulWidget {
   @override
@@ -29,7 +21,7 @@ class _SplashPageState extends State<SplashPage> {
                       vertical: 20,
                       horizontal: 84,
                     ),
-                    child: Image.asset('assets/images/icons/logo_trans.png'),
+                    child: Image.asset('assets/images/logo.png'),
                   ),
                   const Text(
                     'Passes Box',
@@ -78,15 +70,14 @@ class _SplashPageState extends State<SplashPage> {
     const storage = FlutterSecureStorage();
     final auth = await storage.read(key: 'auth');
     if (auth == null) {
-      Get.offAll(HomePage());
+      Get.offAll(() => HomePage());
       return;
     }
 
-    final localAuth = LocalAuthentication();
     final didAuthenticate = await localAuth.authenticate(
       localizedReason: 'Please authenticate to access passwords.',
       biometricOnly: true,
     );
-    if (didAuthenticate) Get.offAll(HomePage());
+    if (didAuthenticate) Get.offAll(() => HomePage());
   }
 }
