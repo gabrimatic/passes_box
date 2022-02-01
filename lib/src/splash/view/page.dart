@@ -1,7 +1,9 @@
-import 'package:passes_box/core/index.dart';
-import 'package:passes_box/src/home/view/home.dart';
+import '../../../core/index.dart';
+import '../../home/view/page.dart';
 
 class SplashPage extends StatefulWidget {
+  static const name = '/';
+
   @override
   _SplashPageState createState() => _SplashPageState();
 }
@@ -60,17 +62,16 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   void _config() {
-    Timer.periodic(const Duration(milliseconds: 1150), (timer) {
+    Timer.periodic(const Duration(milliseconds: 650), (timer) {
       timer.cancel();
       _authenticate();
     });
   }
 
   Future<void> _authenticate() async {
-    const storage = FlutterSecureStorage();
-    final auth = await storage.read(key: 'auth');
-    if (auth == null) {
-      Get.offAll(() => HomePage());
+    final auth = appSH.getBool('auth') ?? false;
+    if (auth) {
+      Get.offAllNamed(HomePage.name);
       return;
     }
 
@@ -78,6 +79,8 @@ class _SplashPageState extends State<SplashPage> {
       localizedReason: 'Please authenticate to access passwords.',
       biometricOnly: true,
     );
-    if (didAuthenticate) Get.offAll(() => HomePage());
+    if (didAuthenticate) {
+      Get.offAllNamed(HomePage.name);
+    }
   }
 }

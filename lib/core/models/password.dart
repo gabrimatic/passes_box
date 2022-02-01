@@ -1,8 +1,20 @@
-class PasswordModel {
+import 'package:hive_flutter/hive_flutter.dart';
+
+@HiveType(typeId: 0)
+class PasswordModel extends HiveObject {
+  @HiveField(0)
   int? id;
+
+  @HiveField(1)
   String? title;
+
+  @HiveField(2)
   String? username;
+
+  @HiveField(3)
   String? imageName;
+
+  @HiveField(4)
   String? password;
 
   PasswordModel({

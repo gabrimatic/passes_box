@@ -1,7 +1,8 @@
 import '../../../core/index.dart';
 import '../../../core/models/password.dart';
 import '../../about/page/about_page.dart';
-import '../cubit/io.dart';
+import '../controller/home_controller.dart';
+import '../controller/io.dart';
 
 Future<void> passwordDialog({
   PasswordModel? model,
@@ -214,7 +215,7 @@ Future<void> passwordDialog({
                     username: usernameC.text,
                     imageName: imageName,
                   );
-                  Get.context!.read<HomeCubit>().addPassword(passwordModel);
+                  HomeController.to.addPassword(passwordModel);
                 } else {
                   final passwordModel = PasswordModel(
                     id: model.id,
@@ -223,10 +224,10 @@ Future<void> passwordDialog({
                     username: usernameC.text,
                     imageName: imageName,
                   );
-                  Get.context!.read<HomeCubit>().updatePassword(passwordModel);
+                  HomeController.to.updatePassword(passwordModel);
                 }
 
-                Get.back(closeOverlays: true);
+                appPopDialog();
               },
             ),
           )
@@ -254,12 +255,12 @@ Future<void> deleteDialog(
       confirmTextColor: Colors.white,
       onConfirm: () async {
         await PassesDB.delete(model.id!);
-        Get.context!.read<HomeCubit>().removePassword(model.id!);
+        HomeController.to.removePassword(model.id!);
 
-        Get.back(closeOverlays: true);
+        appPopDialog();
       },
       textCancel: 'Cancel',
-      onCancel: () => Get.back(closeOverlays: true),
+      onCancel: appPopDialog,
     );
 
 // void search() => Get.bottomSheet(
@@ -321,13 +322,11 @@ Future<void> deleteDialog(
 //     );
 
 Future<void> settings() async {
-  final canUseAuth = (await localAuth.canCheckBiometrics) &&
-      (await localAuth.getAvailableBiometrics()).isNotEmpty;
+  final canUseAuth = await localAuth.isDeviceSupported();
 
   bool hasAuth = false;
-  const storage = FlutterSecureStorage();
   if (canUseAuth) {
-    final auth = await storage.read(key: 'auth');
+    final auth = appSH.getBool('auth');
     hasAuth = auth != null;
   }
 
@@ -335,28 +334,29 @@ Future<void> settings() async {
     Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        ListTile(
-          title: const Text('Authentication'),
-          leading: Icon(
-            Icons.fingerprint_rounded,
-            color: canUseAuth ? appColor3 : null,
+        if (canUseAuth)
+          ListTile(
+            title: const Text('Authentication'),
+            leading: Icon(
+              Icons.fingerprint_rounded,
+              color: canUseAuth ? appColor3 : null,
+            ),
+            subtitle: canUseAuth
+                ? (hasAuth
+                    ? const Text('PassesBox is using biometric auth.')
+                    : const Text('Tap here to active biometric auth.'))
+                : const Text('Your device does not support biometric auth.'),
+            trailing: (canUseAuth && hasAuth)
+                ? IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () async {
+                      await appSH.setBool('auth', false);
+                      appPopDialog();
+                    },
+                  )
+                : null,
+            onTap: (canUseAuth && !hasAuth) ? _authenticate : null,
           ),
-          subtitle: canUseAuth
-              ? (hasAuth
-                  ? const Text('PassesBox is using biometric auth.')
-                  : const Text('Tap here to active biometric auth.'))
-              : const Text('Your device does not support biometric auth.'),
-          trailing: (canUseAuth && hasAuth)
-              ? IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () async {
-                    await storage.write(key: 'auth', value: null);
-                    Get.back(closeOverlays: true);
-                  },
-                )
-              : null,
-          onTap: (canUseAuth && !hasAuth) ? _authenticate : null,
-        ),
         const Divider(),
         const ListTile(
           title: Text('Backup'),
@@ -386,8 +386,8 @@ Future<void> settings() async {
           title: const Text('About'),
           leading: const Icon(Icons.info_outline, color: appColor3),
           onTap: () {
-            Get.back(closeOverlays: true);
-            Get.to(AboutPage());
+            appPopDialog();
+            Get.toNamed(AboutPage.name);
           },
         ),
         const SizedBox(
@@ -407,15 +407,13 @@ Future<void> settings() async {
 }
 
 Future<void> _authenticate() async {
+  // await Permission.sensors.request();
   final didAuthenticate = await localAuth.authenticate(
     localizedReason: 'Please authenticate to enable biometric auth.',
-    biometricOnly: true,
+    // biometricOnly: true,
   );
   if (didAuthenticate) {
-    const storage = FlutterSecureStorage();
-    await storage.write(key: 'auth', value: 'ok');
-    Get.back(closeOverlays: true);
+    await appSH.setBool('auth', true);
+    appPopDialog();
   }
 }
-
-void filter() {}

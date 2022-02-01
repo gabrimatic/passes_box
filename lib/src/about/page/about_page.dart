@@ -1,7 +1,10 @@
-import 'package:passes_box/core/index.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/index.dart';
+
 class AboutPage extends StatelessWidget {
+  static const name = '/about';
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -40,7 +43,7 @@ class AboutPage extends StatelessWidget {
                 alignment: Alignment.topRight,
                 child: IconButton(
                   icon: const Icon(Icons.close),
-                  onPressed: () => Get.back(),
+                  onPressed: Get.back,
                 ),
               ),
               Image.asset(

@@ -1,4 +1,4 @@
-import 'package:passes_box/core/index.dart';
+import '../index.dart';
 
 void appShowSnackbar({required String message}) => Get.showSnackbar(
       GetBar(
