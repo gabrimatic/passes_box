@@ -3,7 +3,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/index.dart';
 
 class AboutPage extends StatelessWidget {
-  static const name = '/about';
+  static const name = '/about.index';
+
+  const AboutPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -4,19 +4,22 @@ import 'dart:io';
 import 'package:encrypt/encrypt.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_saver/file_saver.dart';
+import 'package:flutter/foundation.dart' hide Key;
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../core/index.dart' hide Key;
 import '../../../core/models/password.dart';
-import 'home_controller.dart';
+import 'controller.dart';
 
 final _key = Key.fromUtf8('sI8J0Mb5Aj4jJd5Pv5Ng9U756fq5lLiI');
 final _iv = IV.fromLength(16);
 final _encrypter = Encrypter(AES(_key));
 
 Future<void> backup() async {
-  await Permission.storage.shouldShowRequestRationale;
-  if (!(await Permission.storage.request().isGranted)) {
+  if (appBox.values.isEmpty ||
+      (!kIsWeb &&
+          GetPlatform.isMobile &&
+          !(await Permission.storage.request().isGranted))) {
     return;
   }
 
@@ -27,37 +30,58 @@ Future<void> backup() async {
     iv: _iv,
   );
 
-  final res = await FileSaver.instance.saveAs(
-    'PassesBox_Backup.pbb',
-    encrypted.bytes,
-    '',
-    MimeType.OTHER,
-  );
+  if (kIsWeb || !GetPlatform.isMobile) {
+    await FileSaver.instance.saveFile(
+      'PassesBox_Backup.pbb',
+      encrypted.bytes,
+      '',
+      mimeType: MimeType.OTHER,
+    );
+  } else {
+    await FileSaver.instance.saveAs(
+      'PassesBox_Backup.pbb',
+      encrypted.bytes,
+      '',
+      MimeType.OTHER,
+    );
+  }
 
   appPopDialog();
 
-  appShowSnackbar(message: 'Backup file saved in the $res directory.');
+  appShowSnackbar(message: 'Backup file ${kIsWeb ? 'downloaded' : 'saved'}.');
 }
 
 Future<void> restore() async {
-  if (!(await Permission.storage.request().isGranted)) {
+  if (kIsWeb &&
+      GetPlatform.isMobile &&
+      !(await Permission.storage.request().isGranted)) {
     return;
   }
 
   final file = await FilePicker.platform.pickFiles();
 
-  if (file == null || file.files.isEmpty || file.files.first.path!.isEmpty) {
+  if (file == null || file.files.isEmpty) {
     return;
   }
 
-  final decrepted = _encrypter.decrypt(
-    Encrypted(
-      File(file.files.first.path!).readAsBytesSync(),
-    ),
-    iv: _iv,
-  );
+  String data = '';
+  if (kIsWeb) {
+    data = _encrypter.decrypt(
+      Encrypted(file.files.first.bytes!),
+      iv: _iv,
+    );
+  } else {
+    final fileObj = file.files.first.bytes == null
+        ? File(file.files.first.path!)
+        : File.fromRawPath(file.files.first.bytes!);
 
-  final json = jsonDecode(decrepted);
+    data = _encrypter.decrypt(
+      Encrypted(fileObj.readAsBytesSync()),
+      iv: _iv,
+    );
+  }
+
+  final json = jsonDecode(data);
   final list = <PasswordModel>[];
 
   (json as List).forEach((element) {
@@ -68,12 +92,11 @@ Future<void> restore() async {
     );
   });
 
-  await PassesDB.deleteAll();
+  await appBox.clear();
 
-  for (var i = 0; i < list.length; i++) {
-    await PassesDB.insert(list[i]);
-  }
-  HomeController.to.addAll(list);
+  await PassesDB.insertAll(list);
+
+  HomeController.to.loadAll();
   appPopDialog();
 
   appShowSnackbar(message: 'All passwords have successfully restored!');

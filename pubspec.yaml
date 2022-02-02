@@ -8,6 +8,8 @@ environment:
   sdk: ">=2.15.1 <3.0.0"
 
 dependencies:
+  url_strategy: any
+  universal_html: any
   get: any
   shared_preferences: any
   file_saver: any
@@ -18,18 +20,20 @@ dependencies:
   local_auth: any
   hive: any
   hive_flutter: any
-  sqflite: any
   flutter:
     sdk: flutter
 
 dev_dependencies:
   flutter_lints: any
+  hive_generator: any
+  build_runner: any
 
 flutter:
   uses-material-design: true
 
   assets:
     - assets/images/
+    - assets/files/
 
   fonts:
     - family: raleway

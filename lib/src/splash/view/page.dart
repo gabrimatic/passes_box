@@ -1,8 +1,12 @@
+import 'package:flutter/foundation.dart';
+
 import '../../../core/index.dart';
 import '../../home/view/page.dart';
 
 class SplashPage extends StatefulWidget {
   static const name = '/';
+
+  const SplashPage({Key? key}) : super(key: key);
 
   @override
   _SplashPageState createState() => _SplashPageState();
@@ -23,7 +27,10 @@ class _SplashPageState extends State<SplashPage> {
                       vertical: 20,
                       horizontal: 84,
                     ),
-                    child: Image.asset('assets/images/logo.png'),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      width: 220,
+                    ),
                   ),
                   const Text(
                     'Passes Box',
@@ -62,15 +69,17 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   void _config() {
-    Timer.periodic(const Duration(milliseconds: 650), (timer) {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
       timer.cancel();
       _authenticate();
     });
   }
 
   Future<void> _authenticate() async {
-    final auth = appSH.getBool('auth') ?? false;
-    if (auth) {
+    final auth = kIsWeb || !GetPlatform.isMobile
+        ? false
+        : appSH.getBool('auth') ?? false;
+    if (!auth) {
       Get.offAllNamed(HomePage.name);
       return;
     }

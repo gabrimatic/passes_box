@@ -1,11 +1,13 @@
 import 'package:flutter/services.dart';
 
 import '../../../core/index.dart';
-import '../controller/home_controller.dart';
+import '../controller/controller.dart';
 import '../dialogs/dialogs.dart';
 
 class HomePage extends StatelessWidget {
-  static const name = '/home';
+  static const name = '/index.html';
+
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,109 +16,149 @@ class HomePage extends StatelessWidget {
         body: GetX<HomeController>(
           builder: (controller) {
             if (controller.passesList.isNotEmpty) {
-              return GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: (MediaQuery.of(context).orientation ==
-                          Orientation.portrait)
-                      ? 2
-                      : 4,
-                  crossAxisSpacing: 4,
-                  mainAxisSpacing: 4,
-                ),
-                padding: const EdgeInsets.all(6),
-                itemCount: controller.passesList.length,
-                itemBuilder: (BuildContext context, int index) => Card(
-                  shape: const OutlineInputBorder(
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(32),
-                    ),
-                    borderSide: BorderSide(width: 0.1, color: Colors.blueGrey),
-                  ),
-                  elevation: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      top: 8,
-                      left: 8,
-                      right: 8,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ListTile(
-                          trailing: Image.asset(
-                            'assets/images/${controller.passesList[index].imageName!}.png',
-                            width: 32,
-                            height: 32,
+              return SingleChildScrollView(
+                child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  alignment: WrapAlignment.center,
+                  runAlignment: WrapAlignment.center,
+                  children: List.generate(
+                    controller.passesList.length,
+                    (index) => Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 1,
+                        horizontal: 4,
+                      ),
+                      child: Card(
+                        shape: OutlineInputBorder(
+                          borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(32),
                           ),
-                          title: Text(
-                            controller.passesList[index].title!,
-                          ),
-                          subtitle: Text(
-                            controller.passesList[index].username!,
+                          borderSide: BorderSide(
+                            width: 1,
+                            color: Colors.grey.withOpacity(0.4),
                           ),
                         ),
-                        const Divider(),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () => passwordDialog(
-                                model: controller.passesList[index],
-                              ),
-                              color: appColor3,
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete),
-                              color: appColor3,
-                              onPressed: () => deleteDialog(
-                                controller.passesList[index],
-                              ),
-                            ),
-                            const Spacer(),
-                            PopupMenuButton(
-                              icon: const Icon(
-                                Icons.more_vert,
-                                color: appColor3,
-                              ),
-                              itemBuilder: (context) {
-                                return <PopupMenuEntry>[
-                                  const PopupMenuItem<String>(
-                                    value: 'username',
-                                    child: Text(
-                                      'Copy Username',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: appColor3,
+                        elevation: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            top: 8,
+                            left: 8,
+                            right: 16,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        controller.passesList[index].title!,
+                                        style: const TextStyle(fontSize: 16),
                                       ),
+                                      Text(
+                                        controller.passesList[index].username!,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black54,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  const SizedBox(width: 24),
+                                  Image.asset(
+                                    'assets/images/${controller.passesList[index].imageName!}.png',
+                                    width: 32,
+                                    height: 32,
+                                  )
+                                ],
+                              ),
+                              // ListTile(
+                              //   trailing: Image.asset(
+                              //     'assets/images/${controller.passesList[index].imageName!}.png',
+                              //     width: 32,
+                              //     height: 32,
+                              //   ),
+                              //   title: Text(
+                              //     controller.passesList[index].title!,
+                              //   ),
+                              //   subtitle: Text(
+                              //     controller.passesList[index].username!,
+                              //   ),
+                              // ),
+                              // const Divider(),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit),
+                                    onPressed: () => passwordDialog(
+                                      model: controller.passesList[index],
+                                    ),
+                                    color: appColor3,
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    color: appColor3,
+                                    onPressed: () => deleteDialog(
+                                      controller.passesList[index],
                                     ),
                                   ),
-                                  const PopupMenuItem<String>(
-                                    value: 'pass',
-                                    child: Text(
-                                      'Copy Password',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: appColor3,
-                                      ),
+                                  // const Spacer(),
+                                  PopupMenuButton(
+                                    icon: const Icon(
+                                      Icons.more_vert,
+                                      color: appColor3,
                                     ),
+                                    itemBuilder: (context) {
+                                      return <PopupMenuEntry>[
+                                        const PopupMenuItem<String>(
+                                          value: 'username',
+                                          child: Text(
+                                            'Copy Username',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color: appColor3,
+                                            ),
+                                          ),
+                                        ),
+                                        const PopupMenuItem<String>(
+                                          value: 'pass',
+                                          child: Text(
+                                            'Copy Password',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color: appColor3,
+                                            ),
+                                          ),
+                                        ),
+                                      ];
+                                    },
+                                    onSelected: (value) {
+                                      Clipboard.setData(
+                                        ClipboardData(
+                                          text: value == 'pass'
+                                              ? controller
+                                                  .passesList[index].password
+                                              : controller
+                                                  .passesList[index].username,
+                                        ),
+                                      );
+                                    },
                                   ),
-                                ];
-                              },
-                              onSelected: (value) {
-                                Clipboard.setData(
-                                  ClipboardData(
-                                    text: value == 'pass'
-                                        ? controller.passesList[index].password
-                                        : controller.passesList[index].username,
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        )
-                      ],
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -172,7 +214,12 @@ class HomePage extends StatelessWidget {
                 color: appColor3,
                 onPressed: settings,
               ),
-              // const Spacer(),
+              // Spacer(),
+              // IconButton(
+              //   icon: Icon(Icons.search),
+              //   color: appColor3,
+              //   onPressed: settings,
+              // ),
 
               // BlocBuilder<HomeCubit, HomeState>(
               //   builder: (context, state) {

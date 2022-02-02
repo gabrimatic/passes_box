@@ -90,7 +90,7 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "gabrimatic.info" "\0"
-            VALUE "FileDescription", "A new Flutter project." "\0"
+            VALUE "FileDescription", "A password manager application." "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "passes_box" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2022 gabrimatic.info. All rights reserved." "\0"

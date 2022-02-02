@@ -1,10 +1,8 @@
 import 'package:hive_flutter/hive_flutter.dart';
+part 'password.g.dart';
 
 @HiveType(typeId: 0)
 class PasswordModel extends HiveObject {
-  @HiveField(0)
-  int? id;
-
   @HiveField(1)
   String? title;
 
@@ -18,7 +16,6 @@ class PasswordModel extends HiveObject {
   String? password;
 
   PasswordModel({
-    this.id,
     this.title,
     this.imageName,
     this.username,
@@ -33,7 +30,6 @@ class PasswordModel extends HiveObject {
     String? password,
   }) {
     return PasswordModel(
-      id: id ?? this.id,
       title: title ?? this.title,
       imageName: imageName ?? this.imageName,
       username: username ?? this.username,
@@ -43,7 +39,6 @@ class PasswordModel extends HiveObject {
 
   factory PasswordModel.fromMap(Map<String, dynamic> map) {
     return PasswordModel(
-      id: map['id'] as int?,
       title: map['title'] as String?,
       imageName: map['imageName'] as String?,
       password: map['password'] as String?,
@@ -51,36 +46,10 @@ class PasswordModel extends HiveObject {
     );
   }
 
-  Map<String, dynamic> toMap() => (id == null)
-      ? {
-          'title': title,
-          'imageName': imageName,
-          'username': username,
-          'password': password,
-        }
-      : {
-          'id': id,
-          'title': title,
-          'username': username,
-          'imageName': imageName,
-          'password': password,
-        };
+  Map<String, dynamic> toMap() => {
+        'title': title,
+        'imageName': imageName,
+        'username': username,
+        'password': password,
+      };
 }
-
-/*
-class PasswordModelAdapter extends TypeAdapter<PasswordModel> {
-  @override
-  read(BinaryReader reader) => PasswordModel(
-      group: reader.read(), title: reader.read(), password: reader.read());
-
-  @override
-  int get typeId => 1;
-
-  @override
-  void write(BinaryWriter writer, PasswordModel obj) {
-    writer.write(obj.title);
-    writer.write(obj.password);
-    writer.write(obj.group);
-  }
-}
-*/
