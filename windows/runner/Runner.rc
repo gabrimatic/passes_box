@@ -92,10 +92,10 @@ BEGIN
             VALUE "CompanyName", "gabrimatic.info" "\0"
             VALUE "FileDescription", "A password manager application." "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "passes_box" "\0"
+            VALUE "InternalName", "PassesBox" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2022 gabrimatic.info. All rights reserved." "\0"
             VALUE "OriginalFilename", "passes_box.exe" "\0"
-            VALUE "ProductName", "passes_box" "\0"
+            VALUE "ProductName", "PassesBox" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

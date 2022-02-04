@@ -52,7 +52,7 @@ Future<void> backup() async {
 }
 
 Future<void> restore() async {
-  if (kIsWeb &&
+  if (!kIsWeb &&
       GetPlatform.isMobile &&
       !(await Permission.storage.request().isGranted)) {
     return;

@@ -50,7 +50,7 @@ class AboutPage extends StatelessWidget {
               ),
               Image.asset(
                 'assets/images/logo.png',
-                width: Get.width / 2,
+                width: 220,
               ),
               const SizedBox(height: 16),
               const Text(

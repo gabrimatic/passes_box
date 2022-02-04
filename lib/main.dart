@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:universal_html/html.dart' as html;
 import 'package:url_strategy/url_strategy.dart';
 
 import 'app.dart';
@@ -12,7 +14,8 @@ import 'repository/db.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  setPathUrlStrategy();
+  if (kIsWeb) setPathUrlStrategy();
+
   await appOpenDatabase();
   appSH = await SharedPreferences.getInstance();
 
@@ -21,6 +24,10 @@ Future<void> main() async {
       statusBarColor: appColor4,
     ),
   );
+
+  if (kIsWeb) {
+    html.document.getElementById("loader")?.remove();
+  }
 
   runApp(CenterTheWidget(child: PassesBoxApp()));
 }
