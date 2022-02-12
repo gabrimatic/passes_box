@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+
 import '../../../core/index.dart';
 import '../../../core/models/password.dart';
 
@@ -26,6 +28,14 @@ class HomeController extends GetxController {
     PassesDB.insert(model);
 
     passesList.add(model);
+
+    Clipboard.setData(
+      ClipboardData(
+        text: model.password,
+      ),
+    );
+
+    appShowSnackbar(message: 'Password has copied to the clipboard.');
   }
 
   void removePassword(PasswordModel passwordModel) {

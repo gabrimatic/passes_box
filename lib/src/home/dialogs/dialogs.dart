@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
-import "package:universal_html/html.dart" as html;
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/index.dart';
 import '../../../core/models/password.dart';
@@ -348,18 +345,21 @@ Future<void> settings() async {
               Icons.android,
               color: appColor3,
             ),
-            onTap: () async {
-              final file = await rootBundle.load('assets/files/passesbox.apk');
-              final _base64 = base64Encode(file.buffer.asUint8List());
-              final anchor = html.AnchorElement(
-                  href: 'data:application/octet-stream;base64,$_base64')
-                ..target = 'blank';
+            onTap: () {
+              launch(
+                "https://github.com/gabrimatic/passesbox_readme/raw/main/passesbox.apk",
+              );
+              // final file = await rootBundle.load('assets/files/passesbox.apk');
+              // final _base64 = base64Encode(file.buffer.asUint8List());
+              // final anchor = html.AnchorElement(
+              //     href: 'data:application/octet-stream;base64,$_base64')
+              //   ..target = 'blank';
 
-              anchor.download = 'passesbox.apk';
+              // anchor.download = 'passesbox.apk';
 
-              html.document.body!.append(anchor);
-              anchor.click();
-              anchor.remove();
+              // html.document.body!.append(anchor);
+              // anchor.click();
+              // anchor.remove();
             },
           ),
         if (kIsWeb) const Divider(),
@@ -370,19 +370,22 @@ Future<void> settings() async {
               Icons.window,
               color: appColor3,
             ),
-            onTap: () async {
-              final file =
-                  await rootBundle.load('assets/files/passesbox_windows.zip');
-              final _base64 = base64Encode(file.buffer.asUint8List());
-              final anchor = html.AnchorElement(
-                  href: 'data:application/octet-stream;base64,$_base64')
-                ..target = 'blank';
+            onTap: () {
+              launch(
+                "https://github.com/gabrimatic/passesbox_readme/raw/main/passesbox_windows.zip",
+              );
+              // final file =
+              //     await rootBundle.load('assets/files/passesbox_windows.zip');
+              // final _base64 = base64Encode(file.buffer.asUint8List());
+              // final anchor = html.AnchorElement(
+              //     href: 'data:application/octet-stream;base64,$_base64')
+              //   ..target = 'blank';
 
-              anchor.download = 'passesbox_windows.zip';
+              // anchor.download = 'passesbox_windows.zip';
 
-              html.document.body!.append(anchor);
-              anchor.click();
-              anchor.remove();
+              // html.document.body!.append(anchor);
+              // anchor.click();
+              // anchor.remove();
             },
           ),
         if (canUseAuth)

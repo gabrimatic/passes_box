@@ -164,32 +164,60 @@ class HomePage extends StatelessWidget {
                 ),
               );
             } else {
-              return Align(
-                alignment: Alignment.bottomCenter,
-                child: AnimatedOpacity(
-                  duration: const Duration(seconds: 2),
-                  opacity: 1, //_btnOpacity,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Text(
-                        'ADD YOUR FIRST PASSWORD!',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.black,
-                          letterSpacing: 1,
-                        ),
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Spacer(),
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 84,
                       ),
-                      Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        color: Colors.black54,
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: 250,
+                        //opacity: const AlwaysStoppedAnimation<double>(0.5),
+                        color: Colors.black12,
                       ),
-                      SizedBox(
-                        height: kToolbarHeight,
-                      )
-                    ],
+                    ),
                   ),
-                ),
+                  const Center(
+                    child: Text(
+                      'Passes Box',
+                      style: TextStyle(
+                        color: Colors.black12,
+                        fontSize: 28,
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  AnimatedOpacity(
+                    duration: const Duration(seconds: 2),
+                    opacity: 1, //_btnOpacity,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Text(
+                          'ADD YOUR FIRST PASSWORD!',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.black,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                        Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: Colors.black54,
+                        ),
+                        SizedBox(
+                          height: kToolbarHeight,
+                        )
+                      ],
+                    ),
+                  ),
+                ],
               );
             }
           },

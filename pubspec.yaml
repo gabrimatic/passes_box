@@ -1,6 +1,6 @@
 name: passes_box
 description: A password manager application with high-level encryption, no-sql database and MVVM architecture for Android, iOS and web.
-
+homepage: https://github.com/gabrimatic/passesbox_readme
 
 version: 1.0.0+1
 
@@ -8,6 +8,7 @@ environment:
   sdk: ">=2.16.0 <3.0.0"
 
 dependencies:
+  flutter_secure_storage: any
   url_strategy: any
   universal_html: any
   get: any
@@ -33,7 +34,6 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/files/
 
   fonts:
     - family: raleway

@@ -11,7 +11,7 @@ import '../../../core/index.dart' hide Key;
 import '../../../core/models/password.dart';
 import 'controller.dart';
 
-final _key = Key.fromUtf8('sI8J0Mb5Aj4jJd5Pv5Ng9U756fq5lLiI');
+final _key = Key.fromUtf8(kKey);
 final _iv = IV.fromLength(16);
 final _encrypter = Encrypter(AES(_key));
 
