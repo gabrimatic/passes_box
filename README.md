@@ -1,16 +1,42 @@
-# passes_box
+## Say Hello to PassesBox!
+##### Your offline-secure password manager platform.
 
-A password manager application with high-level encryption, no-sql database and MVVM architecture.
+![screenshot](https://raw.githubusercontent.com/gabrimatic/passesbox_readme/main/screenshot.png "screenshot")
 
-## Getting Started
+PassesBox is developed to help you in managing all your passwords. 
+We have a lot of accounts on social media, emits, credit cards, etc. It's challenging to have a unique, complex, and secure password and remember them simultaneously!
 
-This project is a starting point for a Flutter application.
+**🤝  PassesBox is here to handle this for you.**
 
-A few resources to get you started if this is your first Flutter project:
+PassesBox is entirely **offline**.
+You can backup all your passwords on mobile and restore them on the web or desktop.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+*On the Windows platform, the backup file will save on the **Downloads directory**.*
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Technical info
+This application uses **no-SQL database**, local **biometric authentication**, and a **secure encryption system** to make your experience fast and safe.
+
+Thanks to the Flutter framework, PassesBox supports **Windows**, **Web**, **iOS**, and **Android** platforms.
+
+## Downloads
+* ##### [Web application](https://passesbox.gabrimatic.info "Web application")
+* ##### [Windows application](https://github.com/gabrimatic/passesbox_readme/raw/main/passesbox_windows.zip "Windows application")
+* ##### [Android application](https://github.com/gabrimatic/passesbox_readme/raw/main/passesbox.apk "Android application")
+
+## Source
+https://github.com/gabrimatic/passes_box
+
+## Developer
+By [Hossein Yousefpour](https://gabrimatic.info "Hossein Yousefpour")
+
+&copy; All rights reserved.
+
+## Donate
+* <a href="https://www.buymeacoffee.com/gabrimatic" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Book" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+
+OR
+
+* ETH Address: **0xc2F103b11C5d7bE3Abe292EE549a3ba418655A0E**
+
+## License
+[The MIT License (MIT)](https://raw.githubusercontent.com/gabrimatic/passesbox_readme/main/LICENSE)
