@@ -200,12 +200,14 @@ Future<void> passwordDialog({
       ),
       SizedBox(
         width: Get.width,
-        child: FlatButton.icon(
+        child: ElevatedButton.icon(
           label: const Text('Save'),
-          color: appColor2,
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          textColor: Colors.white,
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: appColor2,
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            foregroundColor: Colors.white,
+            // materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
           icon: const Icon(Icons.save_rounded),
           onPressed: () async {
             if (passwordC.text.isEmpty) return;
