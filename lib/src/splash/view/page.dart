@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:local_auth/local_auth.dart';
 
 import '../../../core/index.dart';
 import '../../home/view/page.dart';
@@ -85,9 +86,10 @@ class _SplashPageState extends State<SplashPage> {
     }
 
     final didAuthenticate = await localAuth.authenticate(
-      localizedReason: 'Please authenticate to access passwords.',
-      biometricOnly: true,
-    );
+        localizedReason: 'Please authenticate to access passwords.',
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+        ));
     if (didAuthenticate) {
       Get.offAllNamed(HomePage.name);
     }
