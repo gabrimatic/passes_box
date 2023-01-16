@@ -1,6 +1,6 @@
 name: passes_box
 description: A password manager application with high-level encryption, no-sql database and MVVM architecture for Android, iOS and web.
-homepage: https://github.com/gabrimatic/passesbox_readme
+homepage: https://github.com/gabrimatic/passes_box
 
 version: 1.0.0+1
 
