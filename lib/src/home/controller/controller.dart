@@ -29,11 +29,11 @@ class HomeController extends GetxController {
 
     passesList.add(model);
 
-    Clipboard.setData(
-      ClipboardData(
-        text: model.password,
-      ),
-    );
+    // Clipboard.setData(
+    //   ClipboardData(
+    //     text: model.password,
+    //   ),
+    // );
 
     appShowSnackbar(message: 'Password has copied to the clipboard.');
   }

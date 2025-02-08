@@ -142,15 +142,15 @@ class HomePage extends StatelessWidget {
                                       ];
                                     },
                                     onSelected: (value) {
-                                      Clipboard.setData(
-                                        ClipboardData(
-                                          text: value == 'pass'
-                                              ? controller
-                                                  .passesList[index].password
-                                              : controller
-                                                  .passesList[index].username,
-                                        ),
-                                      );
+                                      // Clipboard.setData(
+                                      //   ClipboardData(
+                                      //     text: value == 'pass'
+                                      //         ? controller
+                                      //             .passesList[index].password
+                                      //         : controller
+                                      //             .passesList[index].username,
+                                      //   ),
+                                      // );
                                     },
                                   ),
                                 ],

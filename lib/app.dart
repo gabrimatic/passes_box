@@ -13,7 +13,6 @@ class PassesBoxApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'raleway',
         primarySwatch: Colors.deepPurple,
-        accentColor: appColor2,
         primaryColor: appColor3,
         primaryColorDark: appColor4,
       ),
