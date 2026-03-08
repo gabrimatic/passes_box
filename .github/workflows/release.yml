@@ -51,7 +51,7 @@ jobs:
       - run: flutter pub get
       - run: flutter build macos --release
       - name: Archive macOS build
-        run: cd build/macos/Build/Products/Release && zip -r ../../../../../passesbox_macos.zip "Runner.app"
+        run: cd build/macos/Build/Products/Release && zip -r ../../../../../passesbox_macos.zip "passes_box.app"
       - uses: actions/upload-artifact@v4
         with:
           name: macos-build
