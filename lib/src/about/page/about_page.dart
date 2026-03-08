@@ -42,7 +42,7 @@ class AboutPage extends StatelessWidget {
               const SizedBox(height: 8),
               const Divider(),
               ListTile(
-                title: const Text('By Hossein Yousefpour'),
+                title: const Text('By Soroush Yousefpour'),
                 subtitle: const Text('version $appVersion'),
                 trailing: IconButton(
                   icon: const Icon(Icons.public),

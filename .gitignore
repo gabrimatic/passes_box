@@ -46,3 +46,4 @@ app.*.map.json
 *.jks
 *.keystore
 android/local.properties
+.review/

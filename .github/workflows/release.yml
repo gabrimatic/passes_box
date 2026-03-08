@@ -1,0 +1,101 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build apk --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build web --release
+      - name: Archive web build
+        run: cd build/web && zip -r ../../passesbox_web.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: passesbox_web.zip
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build macos --release
+      - name: Archive macOS build
+        run: cd build/macos/Build/Products/Release && zip -r ../../../../../passesbox_macos.zip "Runner.app"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: passesbox_macos.zip
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build windows --release
+      - name: Archive Windows build
+        run: Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath passesbox_windows.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: passesbox_windows.zip
+
+  publish:
+    needs: [build-android, build-web, build-macos, build-windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare release assets
+        run: |
+          mv artifacts/android-apk/app-release.apk passesbox.apk
+          mv artifacts/web-build/passesbox_web.zip passesbox_web.zip
+          mv artifacts/macos-build/passesbox_macos.zip passesbox_macos.zip
+          mv artifacts/windows-build/passesbox_windows.zip passesbox_windows.zip
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            passesbox.apk
+            passesbox_web.zip
+            passesbox_macos.zip
+            passesbox_windows.zip

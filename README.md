@@ -1,4 +1,12 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Android](https://img.shields.io/badge/Platform-Android-green.svg)](https://github.com/gabrimatic/passes_box/releases/latest) [![iOS](https://img.shields.io/badge/Platform-iOS-lightgrey.svg)](https://github.com/gabrimatic/passes_box/releases/latest) [![macOS](https://img.shields.io/badge/Platform-macOS-lightgrey.svg)](https://github.com/gabrimatic/passes_box/releases/latest) [![Web](https://img.shields.io/badge/Platform-Web-orange.svg)](https://passesbox.gabrimatic.info) [![Flutter 3.x+](https://img.shields.io/badge/Flutter-3.x%2B-54C5F8.svg)](https://flutter.dev) [![Dart 3.x+](https://img.shields.io/badge/Dart-3.x%2B-0175C2.svg)](https://dart.dev)
+# PassesBox
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Platform: Android](https://img.shields.io/badge/Platform-Android-green.svg)](https://github.com/gabrimatic/passes_box/releases/latest)
+[![Platform: iOS](https://img.shields.io/badge/Platform-iOS-lightgrey.svg)](https://github.com/gabrimatic/passes_box/releases/latest)
+[![Platform: macOS](https://img.shields.io/badge/Platform-macOS-lightgrey.svg)](https://github.com/gabrimatic/passes_box/releases/latest)
+[![Platform: Web](https://img.shields.io/badge/Platform-Web-orange.svg)](https://passesbox.gabrimatic.info)
+[![Flutter 3.x+](https://img.shields.io/badge/Flutter-3.x%2B-54C5F8.svg)](https://flutter.dev)
+[![Dart 3.x+](https://img.shields.io/badge/Dart-3.x%2B-0175C2.svg)](https://dart.dev)
 
 **An offline-first password manager with AES-256 encryption, biometric access, and zero network dependency.**
 
