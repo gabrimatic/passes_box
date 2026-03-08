@@ -1,21 +1,12 @@
-import 'package:hive_flutter/hive_flutter.dart';
-part 'password.g.dart';
-
-@HiveType(typeId: 0)
-class PasswordModel extends HiveObject {
-  @HiveField(1)
+class PasswordModel {
+  int? key;
   String? title;
-
-  @HiveField(2)
   String? username;
-
-  @HiveField(3)
   String? imageName;
-
-  @HiveField(4)
   String? password;
 
   PasswordModel({
+    this.key,
     this.title,
     this.imageName,
     this.username,
@@ -23,13 +14,14 @@ class PasswordModel extends HiveObject {
   });
 
   PasswordModel copyWith({
-    int? id,
+    int? key,
     String? title,
     String? imageName,
     String? username,
     String? password,
   }) {
     return PasswordModel(
+      key: key ?? this.key,
       title: title ?? this.title,
       imageName: imageName ?? this.imageName,
       username: username ?? this.username,
@@ -37,8 +29,9 @@ class PasswordModel extends HiveObject {
     );
   }
 
-  factory PasswordModel.fromMap(Map<String, dynamic> map) {
+  factory PasswordModel.fromMap(Map<String, dynamic> map, {int? key}) {
     return PasswordModel(
+      key: key,
       title: map['title'] as String?,
       imageName: map['imageName'] as String?,
       password: map['password'] as String?,
@@ -52,4 +45,12 @@ class PasswordModel extends HiveObject {
         'username': username,
         'password': password,
       };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PasswordModel && key != null && key == other.key;
+
+  @override
+  int get hashCode => key.hashCode;
 }

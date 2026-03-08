@@ -1,16 +1,14 @@
 import 'package:flutter/foundation.dart';
-import 'package:local_auth/local_auth.dart';
-
 import '../../../core/index.dart';
 import '../../home/view/page.dart';
 
 class SplashPage extends StatefulWidget {
   static const name = '/';
 
-  const SplashPage({Key? key}) : super(key: key);
+  const SplashPage({super.key});
 
   @override
-  _SplashPageState createState() => _SplashPageState();
+  State<SplashPage> createState() => _SplashPageState();
 }
 
 class _SplashPageState extends State<SplashPage> {
@@ -60,20 +58,10 @@ class _SplashPageState extends State<SplashPage> {
         ),
       );
 
-/* -------------------------------------------------------------------------- */
-/*                                   @CODES                                   */
-/* -------------------------------------------------------------------------- */
   @override
   void initState() {
     super.initState();
-    _config();
-  }
-
-  void _config() {
-    Timer.periodic(const Duration(seconds: 1), (timer) {
-      timer.cancel();
-      _authenticate();
-    });
+    Future.delayed(const Duration(seconds: 1), _authenticate);
   }
 
   Future<void> _authenticate() async {
@@ -87,9 +75,7 @@ class _SplashPageState extends State<SplashPage> {
 
     final didAuthenticate = await localAuth.authenticate(
         localizedReason: 'Please authenticate to access passwords.',
-        options: const AuthenticationOptions(
-          biometricOnly: true,
-        ));
+    );
     if (didAuthenticate) {
       Get.offAllNamed(HomePage.name);
     }

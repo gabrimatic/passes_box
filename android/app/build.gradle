@@ -1,123 +1,38 @@
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
 }
-
-def flutterRoot = localProperties.getProperty('flutter.sdk')
-if (flutterRoot == null) {
-    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
-}
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
-
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
-/*def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-}*/
 
 android {
-    compileSdkVersion 34
+    namespace = "gabrimatic.info.passesbox"
+    compileSdk = 36
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
+        jvmTarget = JavaVersion.VERSION_17
     }
 
     defaultConfig {
-        applicationId "gabrimatic.info.passesbox"
-        minSdkVersion 19
-        targetSdkVersion 31
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        applicationId = "gabrimatic.info.passesbox"
+        minSdkVersion = flutter.minSdkVersion
+        targetSdk = 36
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
     }
-
-/*    signingConfigs {
-        release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
-            storePassword keystoreProperties['storePassword']
-        }
-    }*/
 
     buildTypes {
-/*        release {
-            signingConfig signingConfigs.release
-            shrinkResources true
-            minifyEnabled true
-        }*/
-        debug {
-            signingConfig signingConfigs.debug
+        release {
+            signingConfig = signingConfigs.debug
         }
     }
-
-    // flavorDimensions "api"
-    // productFlavors {
-
-    //     minApi18 {
-    //         dimension "api"
-    //         minSdkVersion 18
-    //         versionCode 1 + flutterVersionCode.toInteger()
-    //         versionName flutterVersionName
-    //         versionNameSuffix "-minApi18"
-    //         ndk {
-    //             abiFilters 'x86_64'
-    //         }
-    //     }
-
-    //     minApi19 {
-    //         dimension "api"
-    //         minSdkVersion 19
-    //         versionCode 2 + flutterVersionCode.toInteger()
-    //         versionName flutterVersionName
-    //         versionNameSuffix "-minApi19"
-    //         ndk {
-    //             abiFilters 'armeabi-v7a'
-    //         }
-    //     }
-
-    //     minApi20 {
-    //         dimension "api"
-    //         minSdkVersion 20
-    //         versionCode 3 + flutterVersionCode.toInteger()
-    //         versionName flutterVersionName
-    //         versionNameSuffix "-minApi20"
-    //         ndk {
-    //             abiFilters 'arm64-v8a'
-    //         }
-    //     }
-
-    // }
-
 }
 
 flutter {
-    source '../..'
-}
-
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    source = "../.."
 }

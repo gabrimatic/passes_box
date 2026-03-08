@@ -7,20 +7,14 @@ class CenterTheWidget extends StatelessWidget {
   final Color color;
 
   const CenterTheWidget({
-    Key? key,
+    super.key,
     required this.child,
     this.color = const Color(0xfff8f8f8),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) => kIsWeb
       ? Container(
-          decoration: const BoxDecoration(
-              // image: DecorationImage(
-              //   fit: BoxFit.cover,
-              //   image: AssetImage('assets/images/main_back.jpg'),
-              // ),
-              ),
           alignment: Alignment.center,
           width: Get.width,
           child: SizedBox(
@@ -28,11 +22,11 @@ class CenterTheWidget extends StatelessWidget {
             child: child,
           ),
         )
-      : Container(child: child);
+      : child;
 }
 
 void appShowSnackbar({required String message}) => Get.showSnackbar(
-      GetBar(
+      GetSnackBar(
         message: message.tr,
         borderRadius: 8,
         icon: const Icon(
@@ -47,6 +41,5 @@ void appShowSnackbar({required String message}) => Get.showSnackbar(
           ],
         ),
         margin: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
-        overlayColor: Colors.white,
       ),
     );

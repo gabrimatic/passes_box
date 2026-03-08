@@ -16,9 +16,9 @@ Future<void> passwordDialog({
   String? imageName = 'social';
 
   if (model != null) {
-    titleC.text = model.title!;
-    passwordC.text = model.password!;
-    usernameC.text = model.username!;
+    titleC.text = model.title ?? '';
+    passwordC.text = model.password ?? '';
+    usernameC.text = model.username ?? '';
     imageName = model.imageName;
   }
 
@@ -35,8 +35,8 @@ Future<void> passwordDialog({
         child: StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) => Column(
             children: [
-              Row(
-                children: const [
+              const Row(
+                children: [
                   Icon(
                     Icons.image_outlined,
                     color: appColor3,
@@ -125,8 +125,8 @@ Future<void> passwordDialog({
                 ],
               ),
               const SizedBox(height: 32),
-              Row(
-                children: const [
+              const Row(
+                children: [
                   Icon(Icons.info_outline, color: appColor3),
                   SizedBox(
                     width: 4,
@@ -179,12 +179,12 @@ Future<void> passwordDialog({
                     onPressed: () {
                       final pass = StringBuffer();
 
-                      const _chars =
+                      const chars =
                           'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890@#&*';
-                      final random = Random();
+                      final random = Random.secure();
                       while (pass.length < 16) {
                         pass.write(
-                          _chars[random.nextInt(_chars.length)],
+                          chars[random.nextInt(chars.length)],
                         );
                       }
 
@@ -206,7 +206,6 @@ Future<void> passwordDialog({
             backgroundColor: appColor2,
             padding: const EdgeInsets.symmetric(vertical: 20),
             foregroundColor: Colors.white,
-            // materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
           icon: const Icon(Icons.save_rounded),
           onPressed: () async {
@@ -244,7 +243,7 @@ Future<void> passwordDialog({
     shape: const OutlineInputBorder(
       borderSide: BorderSide.none,
       borderRadius: BorderRadius.only(
-        topRight: Radius.circular(32), /* topLeft: Radius.circular(32)*/
+        topRight: Radius.circular(32),
       ),
     ),
   );
@@ -266,64 +265,6 @@ Future<void> deleteDialog(
       textCancel: 'Cancel',
       onCancel: appPopDialog,
     );
-
-// void search() => Get.bottomSheet(
-//       Column(
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           Padding(
-//             padding:
-//                 EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 32),
-//             child: TextFormField(
-//               controller: _searchC,
-//               onChanged: (text) {
-//                 if (text.isNotEmpty) {
-//                   setState(() => _filteredList = _mainList
-//                       .where((element) => element.title!
-//                           .toUpperCase()
-//                           .contains(text.toUpperCase()))
-//                       .toList());
-//                 } else
-//                   setState(() => _filteredList = _mainList);
-//               },
-//               decoration: InputDecoration(
-//                 labelText: 'Search',
-//                 border: OutlineInputBorder(),
-//                 suffix: GestureDetector(
-//                   child: Icon(Icons.close),
-//                   onTap: () {
-//                     setState(() {
-//                       _searchC.clear();
-//                       _filteredList = _mainList;
-//                     });
-//                     Get.back(closeOverlays: true);
-//                   },
-//                 ),
-//                 icon: Icon(Icons.search),
-//               ),
-//             ),
-//           ),
-//           Container(
-//             width: Get.width,
-//             child: FlatButton.icon(
-//               label: Text('Done'),
-//               color: appColor2,
-//               textColor: Colors.white.withOpacity(0.9),
-//               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-//               icon: Icon(Icons.done),
-//               onPressed: () async => Get.back(closeOverlays: true),
-//             ),
-//           )
-//         ],
-//       ),
-//       isScrollControlled: true,
-//       backgroundColor: Colors.white,
-//       shape: OutlineInputBorder(
-//           borderSide: BorderSide.none,
-//           borderRadius: BorderRadius.only(
-//             topRight: Radius.circular(32), /* topLeft: Radius.circular(32)*/
-//           )),
-//     );
 
 Future<void> settings() async {
   final canUseAuth = kIsWeb || !GetPlatform.isMobile
@@ -348,20 +289,11 @@ Future<void> settings() async {
               color: appColor3,
             ),
             onTap: () {
-              launch(
-                "https://github.com/gabrimatic/passesbox_readme/raw/main/passesbox.apk",
+              launchUrl(
+                Uri.parse(
+                  "https://github.com/gabrimatic/passesbox_readme/raw/main/passesbox.apk",
+                ),
               );
-              // final file = await rootBundle.load('assets/files/passesbox.apk');
-              // final _base64 = base64Encode(file.buffer.asUint8List());
-              // final anchor = html.AnchorElement(
-              //     href: 'data:application/octet-stream;base64,$_base64')
-              //   ..target = 'blank';
-
-              // anchor.download = 'passesbox.apk';
-
-              // html.document.body!.append(anchor);
-              // anchor.click();
-              // anchor.remove();
             },
           ),
         if (kIsWeb) const Divider(),
@@ -373,21 +305,11 @@ Future<void> settings() async {
               color: appColor3,
             ),
             onTap: () {
-              launch(
-                "https://github.com/gabrimatic/passesbox_readme/raw/main/passesbox_windows.zip",
+              launchUrl(
+                Uri.parse(
+                  "https://github.com/gabrimatic/passesbox_readme/raw/main/passesbox_windows.zip",
+                ),
               );
-              // final file =
-              //     await rootBundle.load('assets/files/passesbox_windows.zip');
-              // final _base64 = base64Encode(file.buffer.asUint8List());
-              // final anchor = html.AnchorElement(
-              //     href: 'data:application/octet-stream;base64,$_base64')
-              //   ..target = 'blank';
-
-              // anchor.download = 'passesbox_windows.zip';
-
-              // html.document.body!.append(anchor);
-              // anchor.click();
-              // anchor.remove();
             },
           ),
         if (canUseAuth)
@@ -432,12 +354,6 @@ Future<void> settings() async {
           onTap: restore,
         ),
         const Divider(),
-/*               ListTile(
-            title: Text('Rate'),
-            leading: Icon(Icons.star_rate_outlined),
-            //    onTap: () {},
-          ),
-          Divider(),*/
         ListTile(
           title: const Text('About'),
           leading: const Icon(Icons.info_outline, color: appColor3),
@@ -456,17 +372,15 @@ Future<void> settings() async {
     shape: const OutlineInputBorder(
       borderSide: BorderSide.none,
       borderRadius: BorderRadius.only(
-        topRight: Radius.circular(32), /* topLeft: Radius.circular(32)*/
+        topRight: Radius.circular(32),
       ),
     ),
   );
 }
 
 Future<void> _authenticate() async {
-  // await Permission.sensors.request();
   final didAuthenticate = await localAuth.authenticate(
     localizedReason: 'Please authenticate to enable biometric auth.',
-    // biometricOnly: true,
   );
   if (didAuthenticate) {
     await appSH.setBool('auth', true);

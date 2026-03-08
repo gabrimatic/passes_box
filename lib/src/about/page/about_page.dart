@@ -5,39 +5,12 @@ import '../../../core/index.dart';
 class AboutPage extends StatelessWidget {
   static const name = '/about.index';
 
-  const AboutPage({Key? key}) : super(key: key);
+  const AboutPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-/*
-        bottomSheet: BottomSheet(
-          elevation: 8,
-          builder: (BuildContext context) => InkWell(
-            onTap: () => launch('https://gabrimatic.info'),
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-              width: Get.width,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'By Hossein Yousefpour | v $appVersion',
-                    style: TextStyle(color: Colors.black, fontSize: 16),
-                  ),
-                  Text(
-                    'Tap to find more info.',
-                    style: TextStyle(color: Colors.blue, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          onClosing: () {},
-        ),
-*/
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -74,7 +47,7 @@ class AboutPage extends StatelessWidget {
                 trailing: IconButton(
                   icon: const Icon(Icons.public),
                   color: appColor2,
-                  onPressed: () => launch('https://gabrimatic.info'),
+                  onPressed: () => launchUrl(Uri.parse('https://gabrimatic.info')),
                 ),
               ),
               const SizedBox(height: 16),

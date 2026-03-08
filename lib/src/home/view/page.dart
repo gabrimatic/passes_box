@@ -7,7 +7,7 @@ import '../dialogs/dialogs.dart';
 class HomePage extends StatelessWidget {
   static const name = '/index.html';
 
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class HomePage extends StatelessWidget {
                           ),
                           borderSide: BorderSide(
                             width: 1,
-                            color: Colors.grey.withOpacity(0.4),
+                            color: Colors.grey.withValues(alpha: 0.4),
                           ),
                         ),
                         elevation: 0,
@@ -60,11 +60,11 @@ class HomePage extends StatelessWidget {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        controller.passesList[index].title!,
+                                        controller.passesList[index].title ?? '',
                                         style: const TextStyle(fontSize: 16),
                                       ),
                                       Text(
-                                        controller.passesList[index].username!,
+                                        controller.passesList[index].username ?? '',
                                         style: const TextStyle(
                                           fontSize: 14,
                                           color: Colors.black54,
@@ -74,26 +74,12 @@ class HomePage extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 24),
                                   Image.asset(
-                                    'assets/images/${controller.passesList[index].imageName!}.png',
+                                    'assets/images/${controller.passesList[index].imageName ?? 'social'}.png',
                                     width: 32,
                                     height: 32,
                                   )
                                 ],
                               ),
-                              // ListTile(
-                              //   trailing: Image.asset(
-                              //     'assets/images/${controller.passesList[index].imageName!}.png',
-                              //     width: 32,
-                              //     height: 32,
-                              //   ),
-                              //   title: Text(
-                              //     controller.passesList[index].title!,
-                              //   ),
-                              //   subtitle: Text(
-                              //     controller.passesList[index].username!,
-                              //   ),
-                              // ),
-                              // const Divider(),
                               Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -111,7 +97,6 @@ class HomePage extends StatelessWidget {
                                       controller.passesList[index],
                                     ),
                                   ),
-                                  // const Spacer(),
                                   PopupMenuButton(
                                     icon: const Icon(
                                       Icons.more_vert,
@@ -142,15 +127,20 @@ class HomePage extends StatelessWidget {
                                       ];
                                     },
                                     onSelected: (value) {
-                                      // Clipboard.setData(
-                                      //   ClipboardData(
-                                      //     text: value == 'pass'
-                                      //         ? controller
-                                      //             .passesList[index].password
-                                      //         : controller
-                                      //             .passesList[index].username,
-                                      //   ),
-                                      // );
+                                      Clipboard.setData(
+                                        ClipboardData(
+                                          text: value == 'pass'
+                                              ? controller
+                                                      .passesList[index].password ??
+                                                  ''
+                                              : controller
+                                                      .passesList[index].username ??
+                                                  '',
+                                        ),
+                                      );
+                                      appShowSnackbar(
+                                        message: '${value == 'pass' ? 'Password' : 'Username'} copied to clipboard.',
+                                      );
                                     },
                                   ),
                                 ],
@@ -178,7 +168,6 @@ class HomePage extends StatelessWidget {
                       child: Image.asset(
                         'assets/images/logo.png',
                         width: 250,
-                        //opacity: const AlwaysStoppedAnimation<double>(0.5),
                         color: Colors.black12,
                       ),
                     ),
@@ -193,29 +182,25 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  AnimatedOpacity(
-                    duration: const Duration(seconds: 2),
-                    opacity: 1, //_btnOpacity,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Text(
-                          'ADD YOUR FIRST PASSWORD!',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.black,
-                            letterSpacing: 1,
-                          ),
+                  const Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'ADD YOUR FIRST PASSWORD!',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
+                          letterSpacing: 1,
                         ),
-                        Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          color: Colors.black54,
-                        ),
-                        SizedBox(
-                          height: kToolbarHeight,
-                        )
-                      ],
-                    ),
+                      ),
+                      Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: Colors.black54,
+                      ),
+                      SizedBox(
+                        height: kToolbarHeight,
+                      )
+                    ],
                   ),
                 ],
               );
@@ -236,42 +221,12 @@ class HomePage extends StatelessWidget {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: BottomAppBar(
           child: Row(
-            children: const [
+            children: [
               IconButton(
-                icon: Icon(Icons.settings),
+                icon: const Icon(Icons.settings),
                 color: appColor3,
                 onPressed: settings,
               ),
-              // Spacer(),
-              // IconButton(
-              //   icon: Icon(Icons.search),
-              //   color: appColor3,
-              //   onPressed: settings,
-              // ),
-
-              // BlocBuilder<HomeCubit, HomeState>(
-              //   builder: (context, state) {
-              //     if (state is HomeLoaded && state.passesList.isNotEmpty) {
-              //       return IconButton(
-              //         icon: const Icon(Icons.search),
-              //         color: appColor3,
-              //         onPressed: () => Get.to(
-              //           BlocProvider.value(
-              //             value: context.read<HomeCubit>(),
-              //             child: const SearchPage(),
-              //           ),
-              //         ),
-              //       );
-              //     } else {
-              //       return const SizedBox.shrink();
-              //     }
-              //   },
-              // ),
-              // IconButton(
-              //   icon: const Icon(Icons.filter_list_rounded),
-              //   color: appColor3,
-              //   onPressed: _filter,
-              // ),
             ],
           ),
         ),

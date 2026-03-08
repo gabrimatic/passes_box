@@ -3,6 +3,8 @@ import 'core/navigation/get_pages.dart';
 import 'src/splash/view/page.dart';
 
 class PassesBoxApp extends StatelessWidget {
+  const PassesBoxApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
@@ -12,7 +14,7 @@ class PassesBoxApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'raleway',
-        primarySwatch: Colors.deepPurple,
+        colorSchemeSeed: Colors.deepPurple,
         primaryColor: appColor3,
         primaryColorDark: appColor4,
       ),

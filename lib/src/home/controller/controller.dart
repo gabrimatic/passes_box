@@ -7,7 +7,7 @@ class HomeController extends GetxController {
   final passesList = <PasswordModel>[].obs;
   HomeController();
 
-  static final to = Get.find<HomeController>();
+  static HomeController get to => Get.find<HomeController>();
 
   @override
   void onInit() {
@@ -16,41 +16,37 @@ class HomeController extends GetxController {
   }
 
   void loadAll() {
-    passesList.value = PassesDB.selectAll();
+    PassesDB.selectAll().then((list) {
+      passesList.value = list;
+    });
   }
 
-  // void addAll(List<PasswordModel> list) {
-  //   passesList.clear();
-  //   passesList.addAll(list);
-  // }
-
-  void addPassword(PasswordModel model) {
-    PassesDB.insert(model);
-
+  Future<void> addPassword(PasswordModel model) async {
+    final key = await PassesDB.insert(model);
+    model.key = key;
     passesList.add(model);
 
-    // Clipboard.setData(
-    //   ClipboardData(
-    //     text: model.password,
-    //   ),
-    // );
+    Clipboard.setData(
+      ClipboardData(text: model.password ?? ''),
+    );
 
-    appShowSnackbar(message: 'Password has copied to the clipboard.');
+    appShowSnackbar(message: 'Password has been copied to the clipboard.');
   }
 
-  void removePassword(PasswordModel passwordModel) {
-    passwordModel.delete();
-
+  Future<void> removePassword(PasswordModel passwordModel) async {
+    await PassesDB.delete(passwordModel);
     passesList.removeWhere(
       (element) => element == passwordModel,
     );
   }
 
-  void updatePassword(PasswordModel model) {
-    PassesDB.update(model);
-
-    passesList[passesList.indexWhere(
+  Future<void> updatePassword(PasswordModel model) async {
+    await PassesDB.update(model);
+    final index = passesList.indexWhere(
       (element) => element == model,
-    )] = model;
+    );
+    if (index != -1) {
+      passesList[index] = model;
+    }
   }
 }

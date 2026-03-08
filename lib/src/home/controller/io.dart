@@ -11,12 +11,8 @@ import '../../../core/index.dart' hide Key;
 import '../../../core/models/password.dart';
 import 'controller.dart';
 
-final _key = Key.fromUtf8(kKey);
-final _iv = IV.fromLength(16);
-final _encrypter = Encrypter(AES(_key));
-
 Future<void> backup() async {
-  if (appBox.values.isEmpty ||
+  if (await PassesDB.isEmpty() ||
       (!kIsWeb &&
           GetPlatform.isMobile &&
           !(await Permission.storage.request().isGranted))) {
@@ -25,24 +21,24 @@ Future<void> backup() async {
 
   final list = HomeController.to.passesList.map((e) => e.toMap()).toList();
 
-  final encrypted = _encrypter.encrypt(
-    jsonEncode(list),
-    iv: _iv,
-  );
+  final iv = IV.fromSecureRandom(16);
+  final encrypter = Encrypter(AES(encryptionKey));
+  final encrypted = encrypter.encrypt(jsonEncode(list), iv: iv);
+  final bytes = Uint8List.fromList(iv.bytes + encrypted.bytes);
 
   if (kIsWeb || !GetPlatform.isMobile) {
     await FileSaver.instance.saveFile(
-      'PassesBox_Backup.pbb',
-      encrypted.bytes,
-      '',
-      mimeType: MimeType.OTHER,
+      name: 'PassesBox_Backup',
+      bytes: bytes,
+      fileExtension: 'pbb',
+      mimeType: MimeType.other,
     );
   } else {
     await FileSaver.instance.saveAs(
-      'PassesBox_Backup.pbb',
-      encrypted.bytes,
-      '',
-      MimeType.OTHER,
+      name: 'PassesBox_Backup',
+      bytes: bytes,
+      fileExtension: 'pbb',
+      mimeType: MimeType.other,
     );
   }
 
@@ -64,40 +60,43 @@ Future<void> restore() async {
     return;
   }
 
-  String data = '';
+  Uint8List rawBytes;
   if (kIsWeb) {
-    data = _encrypter.decrypt(
-      Encrypted(file.files.first.bytes!),
-      iv: _iv,
-    );
+    rawBytes = file.files.first.bytes!;
   } else {
-    final fileObj = file.files.first.bytes == null
-        ? File(file.files.first.path!)
-        : File.fromRawPath(file.files.first.bytes!);
-
-    data = _encrypter.decrypt(
-      Encrypted(fileObj.readAsBytesSync()),
-      iv: _iv,
-    );
+    if (file.files.first.bytes != null) {
+      rawBytes = file.files.first.bytes!;
+    } else {
+      rawBytes = File(file.files.first.path!).readAsBytesSync();
+    }
   }
 
-  final json = jsonDecode(data);
-  final list = <PasswordModel>[];
+  List<PasswordModel> list;
+  try {
+    final iv = IV(Uint8List.fromList(rawBytes.sublist(0, 16)));
+    final ciphertext = Encrypted(Uint8List.fromList(rawBytes.sublist(16)));
+    final encrypter = Encrypter(AES(encryptionKey));
+    final data = encrypter.decrypt(ciphertext, iv: iv);
 
-  (json as List).forEach((element) {
-    list.add(
-      PasswordModel.fromMap(
-        element as Map<String, dynamic>,
-      ),
-    );
-  });
+    final json = jsonDecode(data);
+    list = <PasswordModel>[];
+    for (final element in json as List) {
+      list.add(
+        PasswordModel.fromMap(
+          element as Map<String, dynamic>,
+        ),
+      );
+    }
+  } catch (_) {
+    appShowSnackbar(message: 'Invalid or incompatible backup file.');
+    return;
+  }
 
-  await appBox.clear();
-
+  await PassesDB.clear();
   await PassesDB.insertAll(list);
 
   HomeController.to.loadAll();
   appPopDialog();
 
-  appShowSnackbar(message: 'All passwords have successfully restored!');
+  appShowSnackbar(message: 'All passwords have been restored.');
 }
