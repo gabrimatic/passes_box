@@ -1,5 +1,5 @@
 const appName = 'Passes Box';
-const appVersion = '2.0.0';
+const appVersion = '2.1.0';
 const appAbout = """
 Passes Box helps you manage all your passwords in one place.
 

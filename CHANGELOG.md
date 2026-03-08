@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.1.0] - 2026-03-08
+
+### Added
+- Password search with real-time filtering by title, username, and URL
+- Sort options: newest, oldest, A–Z, Z–A
+- Category filter chips on the home screen
+- Notes field on every credential entry
+- URL field with one-tap launch from the card
+- Password strength indicator in the entry dialog
+- Configurable password generator: length slider, charset toggles (uppercase, lowercase, digits, symbols, no-ambiguous), passphrase mode with word count and separator
+- Duplicate password detection with confirmation prompt
+- TOTP / 2FA support: store a TOTP secret, generate live codes with countdown ring, scan QR to populate
+- Recycle bin: deleted entries are soft-deleted and auto-purged after 30 days
+- Password history: last 5 passwords per entry, accessible from the card
+- Portability-safe backup (.pbbx): AES-256-CBC encrypted with a user passphrase via PBKDF2, restorable on any device
+- CSV import: auto-detects columns, supports Bitwarden, 1Password, Chrome, and generic formats
+- HIBP breach check (opt-in): checks passwords against the Have I Been Pwned database using k-anonymity
+- QR code export/import: encrypt a single entry with a passphrase and share via QR
+- Clipboard auto-clear: copied passwords are cleared from the clipboard after 30 seconds
+- Auto-lock: app locks after 5 minutes of inactivity on mobile
+- Failed authentication limit: 3 failed biometric attempts trigger a 30-second lockout with countdown
+- Screenshot prevention: Android FLAG_SECURE blocks screenshots and task-switcher previews; iOS shows a privacy overlay
+- Haptic feedback on copy actions
+- Password age warnings: yellow at 90 days, red at 180 days
+
+---
+
 ## [2.0.0] - 2026-03-08
 
 ### Changed
