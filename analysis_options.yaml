@@ -1,5 +1,9 @@
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  errors:
+    invalid_dependency: ignore
+
 linter:
   rules:
     prefer_const_constructors: false

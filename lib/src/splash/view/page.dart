@@ -12,6 +12,44 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+  int _failedAttempts = 0;
+  DateTime? _lockoutUntil;
+  int _lockoutSecondsRemaining = 0;
+  Timer? _countdownTimer;
+
+  bool get _isLockedOut {
+    if (_lockoutUntil == null) return false;
+    return DateTime.now().isBefore(_lockoutUntil!);
+  }
+
+  void _startCountdown() {
+    _countdownTimer?.cancel();
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!_isLockedOut) {
+        timer.cancel();
+        if (mounted) {
+          setState(() {
+            _lockoutSecondsRemaining = 0;
+          });
+          _authenticate();
+        }
+        return;
+      }
+      if (mounted) {
+        setState(() {
+          _lockoutSecondsRemaining =
+              _lockoutUntil!.difference(DateTime.now()).inSeconds;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _countdownTimer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: Colors.white,
@@ -37,7 +75,19 @@ class _SplashPageState extends State<SplashPage> {
                       color: appColor2,
                       fontSize: 28,
                     ),
-                  )
+                  ),
+                  if (_lockoutSecondsRemaining > 0)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Text(
+                        'Too many attempts. Try again in ${_lockoutSecondsRemaining}s.',
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -65,6 +115,16 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Future<void> _authenticate() async {
+    if (_isLockedOut) {
+      final remaining = _lockoutUntil!.difference(DateTime.now()).inSeconds;
+      if (mounted) {
+        setState(() {
+          _lockoutSecondsRemaining = remaining;
+        });
+      }
+      return;
+    }
+
     final auth = kIsWeb || !GetPlatform.isMobile
         ? false
         : appSH.getBool('auth') ?? false;
@@ -74,13 +134,26 @@ class _SplashPageState extends State<SplashPage> {
     }
 
     final didAuthenticate = await localAuth.authenticate(
-        localizedReason: 'Please authenticate to access passwords.',
+      localizedReason: 'Please authenticate to access passwords.',
     );
     if (didAuthenticate) {
+      LockService.to.unlock();
       Get.offAllNamed(HomePage.name);
     } else {
-      if (mounted) {
-        Future.delayed(const Duration(milliseconds: 500), _authenticate);
+      _failedAttempts++;
+      if (_failedAttempts >= 3) {
+        _lockoutUntil = DateTime.now().add(const Duration(seconds: 30));
+        _failedAttempts = 0;
+        if (mounted) {
+          setState(() {
+            _lockoutSecondsRemaining = 30;
+          });
+        }
+        _startCountdown();
+      } else {
+        if (mounted) {
+          Future.delayed(const Duration(milliseconds: 500), _authenticate);
+        }
       }
     }
   }

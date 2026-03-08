@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:encrypt/encrypt.dart';
-import 'package:flutter/foundation.dart' hide Key;
+import 'package:cryptography/cryptography.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
@@ -16,52 +16,42 @@ const _storeName = 'passwords';
 const _keyStorageKey = 'passes_box_encryption_key';
 
 late Database _db;
-late Key _encryptionKey;
+late List<int> _encryptionKeyBytes;
 
 final _store = intMapStoreFactory.store(_storeName);
 
-Key get encryptionKey => _encryptionKey;
+List<int> get encryptionKey => _encryptionKeyBytes;
 
-class _AesCodec extends Codec<Map<String, dynamic>, String> {
-  final Key _key;
+class _AesCodec extends AsyncContentCodecBase {
+  final List<int> _keyBytes;
+  final _algorithm = AesCbc.with256bits(macAlgorithm: MacAlgorithm.empty);
 
-  _AesCodec(Key key) : _key = key;
-
-  @override
-  Converter<String, Map<String, dynamic>> get decoder => _AesDecoder(_key);
+  _AesCodec(this._keyBytes);
 
   @override
-  Converter<Map<String, dynamic>, String> get encoder => _AesEncoder(_key);
-}
-
-class _AesEncoder extends Converter<Map<String, dynamic>, String> {
-  final Key _key;
-
-  _AesEncoder(this._key);
-
-  @override
-  String convert(Map<String, dynamic> input) {
-    final iv = IV.fromSecureRandom(16);
-    final encrypter = Encrypter(AES(_key));
-    final encrypted = encrypter.encrypt(jsonEncode(input), iv: iv);
-    final combined = iv.bytes + encrypted.bytes;
+  Future<String> encodeAsync(Object? input) async {
+    final secretKey = await _algorithm.newSecretKeyFromBytes(_keyBytes);
+    final nonce = _algorithm.newNonce();
+    final box = await _algorithm.encrypt(
+      utf8.encode(jsonEncode(input)),
+      secretKey: secretKey,
+      nonce: nonce,
+    );
+    final combined = Uint8List(nonce.length + box.cipherText.length);
+    combined.setRange(0, nonce.length, nonce);
+    combined.setRange(nonce.length, combined.length, box.cipherText);
     return base64.encode(combined);
   }
-}
-
-class _AesDecoder extends Converter<String, Map<String, dynamic>> {
-  final Key _key;
-
-  _AesDecoder(this._key);
 
   @override
-  Map<String, dynamic> convert(String input) {
-    final combined = base64.decode(input);
-    final iv = IV(Uint8List.fromList(combined.sublist(0, 16)));
-    final ciphertext = Uint8List.fromList(combined.sublist(16));
-    final encrypter = Encrypter(AES(_key));
-    final decrypted = encrypter.decrypt(Encrypted(ciphertext), iv: iv);
-    return jsonDecode(decrypted) as Map<String, dynamic>;
+  Future<Object?> decodeAsync(String encoded) async {
+    final secretKey = await _algorithm.newSecretKeyFromBytes(_keyBytes);
+    final combined = base64.decode(encoded);
+    final nonce = combined.sublist(0, 16);
+    final ciphertext = combined.sublist(16);
+    final box = SecretBox(ciphertext, nonce: nonce, mac: Mac.empty);
+    final plainBytes = await _algorithm.decrypt(box, secretKey: secretKey);
+    return jsonDecode(utf8.decode(plainBytes));
   }
 }
 
@@ -78,11 +68,11 @@ Future<void> appOpenDatabase() async {
     await secureStorage.write(key: _keyStorageKey, value: storedKey);
   }
 
-  _encryptionKey = Key(base64.decode(storedKey));
+  _encryptionKeyBytes = base64.decode(storedKey);
 
   final codec = SembastCodec(
     signature: 'passes_box_aes',
-    codec: _AesCodec(_encryptionKey),
+    codec: _AesCodec(_encryptionKeyBytes),
   );
 
   String dbPath;
@@ -98,6 +88,8 @@ Future<void> appOpenDatabase() async {
 
 class PassesDB {
   static Future<int> insert(PasswordModel model) async {
+    model.createdAt = DateTime.now();
+    model.updatedAt = DateTime.now();
     return await _store.add(_db, model.toMap());
   }
 
@@ -114,7 +106,43 @@ class PassesDB {
     await _store.record(model.key!).put(_db, model.toMap());
   }
 
+  static Future<void> updateWithHistory(
+    PasswordModel model, {
+    String? oldPassword,
+  }) async {
+    if (model.key == null) return;
+    if (oldPassword != null &&
+        oldPassword.isNotEmpty &&
+        oldPassword != model.password) {
+      final history = List<String>.from(model.passwordHistory ?? []);
+      history.insert(0, oldPassword);
+      if (history.length > 5) history.removeLast();
+      model.passwordHistory = history;
+    }
+    model.updatedAt = DateTime.now();
+    await _store.record(model.key!).put(_db, model.toMap());
+  }
+
   static Future<void> delete(PasswordModel model) async {
+    if (model.key == null) return;
+    await _store.record(model.key!).delete(_db);
+  }
+
+  static Future<void> softDelete(PasswordModel model) async {
+    if (model.key == null) return;
+    model.isDeleted = true;
+    model.deletedAt = DateTime.now();
+    await _store.record(model.key!).put(_db, model.toMap());
+  }
+
+  static Future<void> restore(PasswordModel model) async {
+    if (model.key == null) return;
+    model.isDeleted = false;
+    model.deletedAt = null;
+    await _store.record(model.key!).put(_db, model.toMap());
+  }
+
+  static Future<void> permanentDelete(PasswordModel model) async {
     if (model.key == null) return;
     await _store.record(model.key!).delete(_db);
   }
@@ -123,7 +151,31 @@ class PassesDB {
     final records = await _store.find(_db);
     return records
         .map((r) => PasswordModel.fromMap(r.value, key: r.key))
+        .where((m) => !m.isDeleted)
         .toList();
+  }
+
+  static Future<List<PasswordModel>> selectDeleted() async {
+    final records = await _store.find(_db);
+    return records
+        .map((r) => PasswordModel.fromMap(r.value, key: r.key))
+        .where((m) => m.isDeleted)
+        .toList();
+  }
+
+  static Future<void> purgeExpiredDeleted() async {
+    final records = await _store.find(_db);
+    final cutoff = DateTime.now().subtract(const Duration(days: 30));
+    await _db.transaction((txn) async {
+      for (final r in records) {
+        final model = PasswordModel.fromMap(r.value, key: r.key);
+        if (model.isDeleted &&
+            model.deletedAt != null &&
+            model.deletedAt!.isBefore(cutoff)) {
+          await _store.record(r.key).delete(txn);
+        }
+      }
+    });
   }
 
   static Future<bool> isEmpty() async {
