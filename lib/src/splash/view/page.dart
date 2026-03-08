@@ -78,6 +78,10 @@ class _SplashPageState extends State<SplashPage> {
     );
     if (didAuthenticate) {
       Get.offAllNamed(HomePage.name);
+    } else {
+      if (mounted) {
+        Future.delayed(const Duration(milliseconds: 500), _authenticate);
+      }
     }
   }
 }

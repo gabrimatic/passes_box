@@ -67,7 +67,7 @@ Future<void> restore() async {
     if (file.files.first.bytes != null) {
       rawBytes = file.files.first.bytes!;
     } else {
-      rawBytes = File(file.files.first.path!).readAsBytesSync();
+      rawBytes = await File(file.files.first.path!).readAsBytes();
     }
   }
 

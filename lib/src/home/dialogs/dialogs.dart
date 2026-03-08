@@ -218,7 +218,7 @@ Future<void> passwordDialog({
                 username: usernameC.text,
                 imageName: imageName,
               );
-              HomeController.to.addPassword(passwordModel);
+              await HomeController.to.addPassword(passwordModel);
             } else {
               model
                 ..title = titleC.text
@@ -226,7 +226,7 @@ Future<void> passwordDialog({
                 ..username = usernameC.text
                 ..imageName = imageName;
 
-              HomeController.to.updatePassword(model);
+              await HomeController.to.updatePassword(model);
             }
 
             appPopDialog();
@@ -258,7 +258,7 @@ Future<void> deleteDialog(
       textConfirm: 'Delete',
       confirmTextColor: Colors.white,
       onConfirm: () async {
-        HomeController.to.removePassword(model);
+        await HomeController.to.removePassword(model);
 
         appPopDialog();
       },
@@ -274,7 +274,7 @@ Future<void> settings() async {
   bool hasAuth = false;
   if (canUseAuth) {
     final auth = appSH.getBool('auth');
-    hasAuth = auth != null;
+    hasAuth = auth == true;
   }
 
   await Get.bottomSheet(
@@ -291,7 +291,7 @@ Future<void> settings() async {
             onTap: () {
               launchUrl(
                 Uri.parse(
-                  "https://github.com/gabrimatic/passesbox_readme/raw/main/passesbox.apk",
+                  "https://github.com/gabrimatic/passes_box/releases/latest",
                 ),
               );
             },
@@ -307,7 +307,7 @@ Future<void> settings() async {
             onTap: () {
               launchUrl(
                 Uri.parse(
-                  "https://github.com/gabrimatic/passesbox_readme/raw/main/passesbox_windows.zip",
+                  "https://github.com/gabrimatic/passes_box/releases/latest",
                 ),
               );
             },

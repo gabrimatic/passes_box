@@ -15,21 +15,38 @@ flutter run
 
 ```
 lib/
+├── main.dart
+├── app.dart                     # App widget, theme, routes
 ├── core/
-│   ├── models/          # Data models (PasswordModel)
-│   ├── navigation/      # App navigation helpers
-│   ├── values/          # Shared preferences, constants
-│   └── widgets/         # Reusable widgets
+│   ├── index.dart               # Barrel export
+│   ├── models/
+│   │   └── password.dart        # PasswordModel
+│   ├── navigation/
+│   │   ├── get_pages.dart       # Route definitions
+│   │   └── navigation.dart      # Navigation helpers
+│   ├── values/
+│   │   ├── colors.dart
+│   │   ├── strings.dart
+│   │   └── values.dart          # Shared preferences, constants
+│   └── widgets/
+│       └── widgets.dart         # Reusable widgets
 ├── repository/
-│   ├── db.dart          # Database + encryption layer
+│   ├── db.dart                  # Database + encryption layer
 │   ├── db_factory_io.dart
 │   └── db_factory_web.dart
-├── src/
-│   └── home/
-│       ├── controller/  # GetX controller, backup/restore
-│       ├── dialogs/     # Password add/edit dialogs
-│       └── view/        # Home page UI
-└── main.dart
+└── src/
+    ├── splash/
+    │   └── view/page.dart       # Biometric auth gate
+    ├── home/
+    │   ├── controller/
+    │   │   ├── controller.dart  # GetX controller, CRUD
+    │   │   └── io.dart          # Backup / restore
+    │   ├── dialogs/
+    │   │   └── dialogs.dart     # Password entry, settings, delete
+    │   └── view/
+    │       └── page.dart
+    └── about/
+        └── page/about_page.dart
 ```
 
 ## Key Conventions

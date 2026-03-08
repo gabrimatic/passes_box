@@ -9,7 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 
 import '../core/models/password.dart';
-import 'db_factory_io.dart' if (dart.library.html) 'db_factory_web.dart';
+import 'db_factory_io.dart' if (dart.library.js_interop) 'db_factory_web.dart';
 
 const _dbName = 'passes_box.db';
 const _storeName = 'passwords';
