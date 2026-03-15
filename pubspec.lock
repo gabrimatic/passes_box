@@ -415,10 +415,10 @@ packages:
     dependency: "direct main"
     description:
       name: otp_auth
-      sha256: eaf4c36f474ebb26a930cfb71ca13b25221817a8198abd1358aa5c9ce3bf7275
+      sha256: eeb82e2a6fe644374112dfa52cb7e71cf376b1362394cfc65c81f74bcc076412
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
+    version: "1.0.1"
   path:
     dependency: transitive
     description:
