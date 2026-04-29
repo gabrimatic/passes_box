@@ -52,7 +52,7 @@ PassesBox does not transmit data. Everything stays on device.
 - **Algorithm:** AES-256-CBC via the [`encrypt`](https://pub.dev/packages/encrypt) package
 - **Key:** 256-bit key generated once with `Random.secure()`, stored in platform secure storage
 - **IV:** 16 random bytes prepended to every ciphertext, unique per operation
-- **Database:** sembast with a custom `SembastCodec` — every record is AES-encrypted before writing to disk
+- **Database:** sembast with a custom `SembastCodec`. Every record is AES-encrypted before writing to disk.
 - **Backups:** `.pbb` files are AES-encrypted with the same device key before saving
 
 No hardcoded keys. No static IVs. No plaintext at rest.
@@ -77,7 +77,7 @@ No hardcoded keys. No static IVs. No plaintext at rest.
 | Android | [GitHub Releases](https://github.com/gabrimatic/passes_box/releases/latest) |
 | macOS | [GitHub Releases](https://github.com/gabrimatic/passes_box/releases/latest) |
 | Windows | [GitHub Releases](https://github.com/gabrimatic/passes_box/releases/latest) |
-| Web | [Build from source](#building-from-source) — run locally with `flutter run -d chrome` |
+| Web | [Build from source](#building-from-source). Run locally with `flutter run -d chrome` |
 
 ---
 
