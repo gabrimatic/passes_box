@@ -8,9 +8,9 @@
 [![Flutter 3.x+](https://img.shields.io/badge/Flutter-3.x%2B-54C5F8.svg)](https://flutter.dev)
 [![Dart 3.x+](https://img.shields.io/badge/Dart-3.x%2B-0175C2.svg)](https://dart.dev)
 
-**An offline-first password manager with AES-256 encryption, biometric access, and zero network dependency.**
+Offline-first password manager with AES-256 encryption and biometric access. No network dependency.
 
-PassesBox stores every credential you have, from social accounts to credit cards, in an encrypted local database. It generates strong passwords on demand, locks behind biometrics, and lets you carry your data across devices through encrypted backup files.
+PassesBox stores credentials in an encrypted local database. It generates strong passwords on demand, locks behind biometrics on mobile, and supports encrypted `.pbb` backup files for moving data between devices.
 
 <p align="center">
   <img src="assets/screenshot.png" width="600" alt="PassesBox screenshot">
@@ -21,12 +21,12 @@ PassesBox stores every credential you have, from social accounts to credit cards
 ## Features
 
 - AES-256-CBC encryption with a random per-device key
-- Random 16-byte IV generated per operation via `Random.secure()`
-- Encrypted sembast database — all records are encrypted at rest
+- Random 16-byte IV per operation via `Random.secure()`
+- Encrypted sembast database; records are encrypted at rest
 - Biometric authentication gate (fingerprint, Face ID) on mobile
-- Cryptographically secure password generator (16-character, mixed charset)
+- Password generator (16 characters, mixed charset, cryptographically secure RNG)
 - Encrypted backup and restore via `.pbb` files
-- Entirely offline — no network calls, no telemetry, no tracking
+- Offline. No network calls, no telemetry.
 - Cross-platform: Android, iOS, macOS, Web
 
 ---
@@ -45,7 +45,7 @@ PassesBox stores every credential you have, from social accounts to credit cards
 
 ## Security
 
-PassesBox never transmits data. Everything stays on device.
+PassesBox does not transmit data. Everything stays on device.
 
 ### Encryption architecture
 
