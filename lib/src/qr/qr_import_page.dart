@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart';
-import 'package:cryptography/cryptography.dart' hide Hmac;
+import 'package:cryptography/cryptography.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../core/index.dart';
@@ -50,20 +49,24 @@ class _QrImportPageState extends State<QrImportPage> {
   }
 
   Future<PasswordModel> _decryptEntry(String qrData, String passphrase) async {
-    if (!qrData.startsWith('pbbentry:')) throw Exception('Not a PassesBox QR');
-    final combined = base64.decode(qrData.substring(9));
+    if (!qrData.startsWith('pbbentry2:')) throw Exception('Not a PassesBox QR');
+
+    // Format: salt(16) + nonce(12) + mac(16) + ciphertext
+    final combined = base64.decode(qrData.substring(10));
+    if (combined.length < 45) throw const FormatException('QR data too short');
+
     final salt = combined.sublist(0, 16);
-    final ivBytes = combined.sublist(16, 32);
-    final ciphertext = combined.sublist(32);
+    final nonce = combined.sublist(16, 28);
+    final mac = Mac(combined.sublist(28, 44));
+    final ciphertext = combined.sublist(44);
 
-    final key = _pbkdf2Simple(passphrase, salt);
-    final algorithm = AesCbc.with256bits(macAlgorithm: MacAlgorithm.empty);
+    final key = await _argon2id(passphrase, salt);
+    final algorithm = AesGcm.with256bits();
     final secretKey = await algorithm.newSecretKeyFromBytes(key);
-    final box = SecretBox(ciphertext, nonce: ivBytes, mac: Mac.empty);
+    final box = SecretBox(ciphertext, nonce: nonce, mac: mac);
     final plainBytes = await algorithm.decrypt(box, secretKey: secretKey);
-    final json = utf8.decode(plainBytes);
 
-    final map = jsonDecode(json) as Map<String, dynamic>;
+    final map = jsonDecode(utf8.decode(plainBytes)) as Map<String, dynamic>;
     return PasswordModel(
       title: map['title'] as String?,
       username: map['username'] as String?,
@@ -75,19 +78,19 @@ class _QrImportPageState extends State<QrImportPage> {
     );
   }
 
-  Uint8List _pbkdf2Simple(String password, List<int> salt) {
-    final passwordBytes = utf8.encode(password);
-    final hmac = Hmac(sha256, passwordBytes);
-    var u =
-        Uint8List.fromList(hmac.convert([...salt, 0, 0, 0, 1]).bytes);
-    final block = Uint8List.fromList(u);
-    for (var i = 1; i < 10000; i++) {
-      u = Uint8List.fromList(hmac.convert(u).bytes);
-      for (var j = 0; j < block.length; j++) {
-        block[j] ^= u[j];
-      }
-    }
-    return block;
+  // Argon2id key derivation — memory-hard, GPU/ASIC resistant.
+  Future<Uint8List> _argon2id(String password, List<int> salt) async {
+    final argon2 = Argon2id(
+      parallelism: 1,
+      memory: 4096,
+      iterations: 3,
+      hashLength: 32,
+    );
+    final derived = await argon2.deriveKey(
+      secretKey: SecretKeyData(utf8.encode(password)),
+      nonce: salt,
+    );
+    return Uint8List.fromList(await derived.extractBytes());
   }
 
   @override
@@ -100,7 +103,7 @@ class _QrImportPageState extends State<QrImportPage> {
               onDetect: (capture) {
                 if (_scanned) return;
                 final raw = capture.barcodes.firstOrNull?.rawValue;
-                if (raw != null && raw.startsWith('pbbentry:')) {
+                if (raw != null && raw.startsWith('pbbentry2:')) {
                   _scanned = true;
                   setState(() => _scannedData = raw);
                 }

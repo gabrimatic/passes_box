@@ -22,11 +22,13 @@ final _store = intMapStoreFactory.store(_storeName);
 
 List<int> get encryptionKey => _encryptionKeyBytes;
 
-class _AesCodec extends AsyncContentCodecBase {
+// AES-256-GCM codec — authenticated encryption, 12-byte nonce, 16-byte tag.
+// Record format: nonce(12) + mac(16) + ciphertext, base64-encoded.
+class _AesGcmCodec extends AsyncContentCodecBase {
   final List<int> _keyBytes;
-  final _algorithm = AesCbc.with256bits(macAlgorithm: MacAlgorithm.empty);
+  final _algorithm = AesGcm.with256bits();
 
-  _AesCodec(this._keyBytes);
+  _AesGcmCodec(this._keyBytes);
 
   @override
   Future<String> encodeAsync(Object? input) async {
@@ -37,9 +39,10 @@ class _AesCodec extends AsyncContentCodecBase {
       secretKey: secretKey,
       nonce: nonce,
     );
-    final combined = Uint8List(nonce.length + box.cipherText.length);
-    combined.setRange(0, nonce.length, nonce);
-    combined.setRange(nonce.length, combined.length, box.cipherText);
+    final combined = Uint8List(12 + 16 + box.cipherText.length);
+    combined.setRange(0, 12, nonce);
+    combined.setRange(12, 28, box.mac.bytes);
+    combined.setRange(28, combined.length, box.cipherText);
     return base64.encode(combined);
   }
 
@@ -47,9 +50,10 @@ class _AesCodec extends AsyncContentCodecBase {
   Future<Object?> decodeAsync(String encoded) async {
     final secretKey = await _algorithm.newSecretKeyFromBytes(_keyBytes);
     final combined = base64.decode(encoded);
-    final nonce = combined.sublist(0, 16);
-    final ciphertext = combined.sublist(16);
-    final box = SecretBox(ciphertext, nonce: nonce, mac: Mac.empty);
+    final nonce = combined.sublist(0, 12);
+    final mac = Mac(combined.sublist(12, 28));
+    final ciphertext = combined.sublist(28);
+    final box = SecretBox(ciphertext, nonce: nonce, mac: mac);
     final plainBytes = await _algorithm.decrypt(box, secretKey: secretKey);
     return jsonDecode(utf8.decode(plainBytes));
   }
@@ -70,11 +74,6 @@ Future<void> appOpenDatabase() async {
 
   _encryptionKeyBytes = base64.decode(storedKey);
 
-  final codec = SembastCodec(
-    signature: 'passes_box_aes',
-    codec: _AesCodec(_encryptionKeyBytes),
-  );
-
   String dbPath;
   if (kIsWeb) {
     dbPath = _dbName;
@@ -83,6 +82,10 @@ Future<void> appOpenDatabase() async {
     dbPath = '${dir.path}/$_dbName';
   }
 
+  final codec = SembastCodec(
+    signature: 'passes_box_gcm',
+    codec: _AesGcmCodec(_encryptionKeyBytes),
+  );
   _db = await getDbFactory().openDatabase(dbPath, codec: codec);
 }
 

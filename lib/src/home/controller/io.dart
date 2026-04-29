@@ -23,7 +23,7 @@ Future<void> backup() async {
 
   final list = HomeController.to.passesList.map((e) => e.toMap()).toList();
 
-  final algorithm = AesCbc.with256bits(macAlgorithm: MacAlgorithm.empty);
+  final algorithm = AesGcm.with256bits();
   final secretKey = await algorithm.newSecretKeyFromBytes(encryptionKey);
   final nonce = algorithm.newNonce();
   final box = await algorithm.encrypt(
@@ -31,7 +31,11 @@ Future<void> backup() async {
     secretKey: secretKey,
     nonce: nonce,
   );
-  final bytes = Uint8List.fromList(nonce + box.cipherText);
+  // Format: nonce(12) + mac(16) + ciphertext
+  final bytes = Uint8List(12 + 16 + box.cipherText.length);
+  bytes.setRange(0, 12, nonce);
+  bytes.setRange(12, 28, box.mac.bytes);
+  bytes.setRange(28, bytes.length, box.cipherText);
 
   if (kIsWeb || !GetPlatform.isMobile) {
     await FileSaver.instance.saveFile(
@@ -68,23 +72,18 @@ Future<void> restore() async {
 
   List<PasswordModel> list;
   try {
-    final algorithm = AesCbc.with256bits(macAlgorithm: MacAlgorithm.empty);
+    // Format: nonce(12) + mac(16) + ciphertext
+    if (rawBytes.length < 29) throw const FormatException('File too short');
+    final nonce = rawBytes.sublist(0, 12);
+    final mac = Mac(rawBytes.sublist(12, 28));
+    final ciphertext = rawBytes.sublist(28);
+    final algorithm = AesGcm.with256bits();
     final secretKey = await algorithm.newSecretKeyFromBytes(encryptionKey);
-    final nonce = rawBytes.sublist(0, 16);
-    final ciphertext = rawBytes.sublist(16);
-    final box = SecretBox(ciphertext, nonce: nonce, mac: Mac.empty);
+    final box = SecretBox(ciphertext, nonce: nonce, mac: mac);
     final plainBytes = await algorithm.decrypt(box, secretKey: secretKey);
-    final data = utf8.decode(plainBytes);
-
-    final json = jsonDecode(data);
-    list = <PasswordModel>[];
-    for (final element in json as List) {
-      list.add(
-        PasswordModel.fromMap(
-          element as Map<String, dynamic>,
-        ),
-      );
-    }
+    list = (jsonDecode(utf8.decode(plainBytes)) as List)
+        .map((e) => PasswordModel.fromMap(e as Map<String, dynamic>))
+        .toList();
   } catch (_) {
     appShowSnackbar(message: 'Invalid or incompatible backup file.');
     return;
@@ -99,28 +98,20 @@ Future<void> restore() async {
   appShowSnackbar(message: 'All passwords have been restored.');
 }
 
-// PBKDF2-SHA256 key derivation
-Uint8List _pbkdf2(String password, Uint8List salt,
-    {int iterations = 100000, int keyLength = 32}) {
-  final passwordBytes = utf8.encode(password);
-  final hmac = Hmac(sha256, passwordBytes);
-
-  final blocks = <int>[];
-  var blockIndex = 1;
-  while (blocks.length < keyLength) {
-    var u = Uint8List.fromList(
-        hmac.convert([...salt, 0, 0, 0, blockIndex]).bytes);
-    final block = Uint8List.fromList(u);
-    for (var i = 1; i < iterations; i++) {
-      u = Uint8List.fromList(hmac.convert(u).bytes);
-      for (var j = 0; j < block.length; j++) {
-        block[j] ^= u[j];
-      }
-    }
-    blocks.addAll(block);
-    blockIndex++;
-  }
-  return Uint8List.fromList(blocks.sublist(0, keyLength));
+// Argon2id key derivation — memory-hard, GPU/ASIC resistant.
+// m=4096 KiB, t=3 iterations, p=1 lane; produces a 32-byte key.
+Future<Uint8List> _argon2id(String password, Uint8List salt) async {
+  final argon2 = Argon2id(
+    parallelism: 1,
+    memory: 4096,
+    iterations: 3,
+    hashLength: 32,
+  );
+  final derived = await argon2.deriveKey(
+    secretKey: SecretKeyData(utf8.encode(password)),
+    nonce: salt,
+  );
+  return Uint8List.fromList(await derived.extractBytes());
 }
 
 Future<void> exportPortable() async {
@@ -176,9 +167,9 @@ Future<void> exportPortable() async {
     final salt =
         Uint8List.fromList(List.generate(16, (_) => random.nextInt(256)));
 
-    final key = _pbkdf2(passphraseC.text, salt);
+    final key = await _argon2id(passphraseC.text, salt);
 
-    final algorithm = AesCbc.with256bits(macAlgorithm: MacAlgorithm.empty);
+    final algorithm = AesGcm.with256bits();
     final secretKey = await algorithm.newSecretKeyFromBytes(key);
     final nonce = algorithm.newNonce();
     final box = await algorithm.encrypt(
@@ -187,12 +178,12 @@ Future<void> exportPortable() async {
       nonce: nonce,
     );
 
-    // Format: version(1) + salt(16) + iv(16) + ciphertext
-    final output = Uint8List(1 + 16 + 16 + box.cipherText.length);
-    output[0] = 1; // version
-    output.setRange(1, 17, salt);
-    output.setRange(17, 33, nonce);
-    output.setRange(33, output.length, box.cipherText);
+    // Format: salt(16) + nonce(12) + mac(16) + ciphertext
+    final output = Uint8List(16 + 12 + 16 + box.cipherText.length);
+    output.setRange(0, 16, salt);
+    output.setRange(16, 28, nonce);
+    output.setRange(28, 44, box.mac.bytes);
+    output.setRange(44, output.length, box.cipherText);
 
     await FileSaver.instance.saveFile(
       name: 'passesbox_portable_${DateTime.now().millisecondsSinceEpoch}',
@@ -218,7 +209,8 @@ Future<void> restorePortable() async {
     if (xfile == null) return;
 
     final rawBytes = await xfile.readAsBytes();
-    if (rawBytes.length < 34) {
+    // Format: salt(16) + nonce(12) + mac(16) + ciphertext — minimum 45 bytes.
+    if (rawBytes.length < 45) {
       appShowSnackbar(message: 'Invalid backup file.');
       return;
     }
@@ -249,23 +241,18 @@ Future<void> restorePortable() async {
 
     if (confirmed != true) return;
 
-    final version = rawBytes[0];
-    if (version != 1) {
-      appShowSnackbar(message: 'Unsupported backup version.');
-      return;
-    }
-
-    final salt = rawBytes.sublist(1, 17);
-    final ivBytes = rawBytes.sublist(17, 33);
-    final ciphertext = rawBytes.sublist(33);
-
-    final key = _pbkdf2(passphraseC.text, salt);
+    // Argon2id + AES-256-GCM: salt(16) + nonce(12) + mac(16) + ciphertext
+    final salt = rawBytes.sublist(0, 16);
+    final nonce = rawBytes.sublist(16, 28);
+    final mac = Mac(rawBytes.sublist(28, 44));
+    final ciphertext = rawBytes.sublist(44);
 
     String jsonData;
     try {
-      final algorithm = AesCbc.with256bits(macAlgorithm: MacAlgorithm.empty);
+      final key = await _argon2id(passphraseC.text, salt);
+      final algorithm = AesGcm.with256bits();
       final secretKey = await algorithm.newSecretKeyFromBytes(key);
-      final box = SecretBox(ciphertext, nonce: ivBytes, mac: Mac.empty);
+      final box = SecretBox(ciphertext, nonce: nonce, mac: mac);
       final plainBytes = await algorithm.decrypt(box, secretKey: secretKey);
       jsonData = utf8.decode(plainBytes);
     } catch (_) {

@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.2.0] - 2026-04-30
+
+### Changed
+
+- Encryption upgraded from AES-256-CBC (no authentication) to AES-256-GCM throughout. Every ciphertext now carries a 16-byte authentication tag; tampered or corrupted data is rejected before decryption.
+- Database codec signature updated to `passes_box_gcm`. Existing databases are incompatible and must be re-imported.
+- Device backup format (`.pbb`): nonce reduced from 16 to 12 bytes (GCM standard); authentication tag appended. Old `.pbb` files are not compatible.
+- Portable backup format (`.pbbx`): key derivation changed from PBKDF2-SHA256 (100k iterations) to Argon2id (m=4096 KiB, t=3, p=1). Version byte removed. Old `.pbbx` files are not compatible.
+- QR export format (`pbbentry2:`): key derivation changed from PBKDF2-SHA256 (10k iterations) to Argon2id. Old `pbbentry:` QR codes are not scannable by this version.
+
+---
+
 ## [2.1.0] - 2026-03-08
 
 ### Added

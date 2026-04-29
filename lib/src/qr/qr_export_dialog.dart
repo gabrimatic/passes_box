@@ -2,8 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart';
-import 'package:cryptography/cryptography.dart' hide Hmac;
+import 'package:cryptography/cryptography.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -137,8 +136,8 @@ Future<String> _encryptEntry(PasswordModel model, String passphrase) async {
   final salt =
       Uint8List.fromList(List.generate(16, (_) => random.nextInt(256)));
 
-  final key = _pbkdf2Simple(passphrase, salt);
-  final algorithm = AesCbc.with256bits(macAlgorithm: MacAlgorithm.empty);
+  final key = await _argon2id(passphrase, salt);
+  final algorithm = AesGcm.with256bits();
   final secretKey = await algorithm.newSecretKeyFromBytes(key);
   final nonce = algorithm.newNonce();
   final box = await algorithm.encrypt(
@@ -147,26 +146,28 @@ Future<String> _encryptEntry(PasswordModel model, String passphrase) async {
     nonce: nonce,
   );
 
-  // Encode: salt(16) + iv(16) + ciphertext as base64
-  final combined = Uint8List(32 + box.cipherText.length);
+  // Encode: salt(16) + nonce(12) + mac(16) + ciphertext as base64
+  final combined = Uint8List(16 + 12 + 16 + box.cipherText.length);
   combined.setRange(0, 16, salt);
-  combined.setRange(16, 32, nonce);
-  combined.setRange(32, combined.length, box.cipherText);
+  combined.setRange(16, 28, nonce);
+  combined.setRange(28, 44, box.mac.bytes);
+  combined.setRange(44, combined.length, box.cipherText);
 
-  return 'pbbentry:${base64.encode(combined)}';
+  return 'pbbentry2:${base64.encode(combined)}';
 }
 
-Uint8List _pbkdf2Simple(String password, Uint8List salt) {
-  final passwordBytes = utf8.encode(password);
-  final hmac = Hmac(sha256, passwordBytes);
-  var u =
-      Uint8List.fromList(hmac.convert([...salt, 0, 0, 0, 1]).bytes);
-  final block = Uint8List.fromList(u);
-  for (var i = 1; i < 10000; i++) {
-    u = Uint8List.fromList(hmac.convert(u).bytes);
-    for (var j = 0; j < block.length; j++) {
-      block[j] ^= u[j];
-    }
-  }
-  return block;
+// Argon2id key derivation — memory-hard, GPU/ASIC resistant.
+// m=4096 KiB, t=3 iterations, p=1 lane; produces a 32-byte key.
+Future<Uint8List> _argon2id(String password, Uint8List salt) async {
+  final argon2 = Argon2id(
+    parallelism: 1,
+    memory: 4096,
+    iterations: 3,
+    hashLength: 32,
+  );
+  final derived = await argon2.deriveKey(
+    secretKey: SecretKeyData(utf8.encode(password)),
+    nonce: salt,
+  );
+  return Uint8List.fromList(await derived.extractBytes());
 }
