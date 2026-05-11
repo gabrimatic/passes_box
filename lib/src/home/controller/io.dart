@@ -2,22 +2,17 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:cryptography/cryptography.dart' hide Hmac;
-import 'package:csv/csv.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:permission_handler/permission_handler.dart';
 
 import '../../../core/index.dart';
 import '../../../core/models/password.dart';
 import 'controller.dart';
 
 Future<void> backup() async {
-  if (await PassesDB.isEmpty() ||
-      (!kIsWeb &&
-          GetPlatform.isMobile &&
-          !(await Permission.storage.request().isGranted))) {
+  if (await PassesDB.isEmpty()) {
     return;
   }
 
@@ -59,12 +54,6 @@ Future<void> backup() async {
 }
 
 Future<void> restore() async {
-  if (!kIsWeb &&
-      GetPlatform.isMobile &&
-      !(await Permission.storage.request().isGranted)) {
-    return;
-  }
-
   final xfile = await openFile();
   if (xfile == null) return;
 
@@ -88,6 +77,20 @@ Future<void> restore() async {
     appShowSnackbar(message: 'Invalid or incompatible backup file.');
     return;
   }
+
+  final confirmed = await Get.defaultDialog<bool>(
+    title: 'Replace Vault?',
+    content: Text(
+      'This backup contains ${list.length} entries. Restoring it will replace the current vault on this device.',
+    ),
+    textConfirm: 'Replace',
+    textCancel: 'Cancel',
+    confirmTextColor: Colors.white,
+    buttonColor: Colors.red,
+    onConfirm: () => Get.back(result: true),
+    onCancel: () => Get.back(result: false),
+  );
+  if (confirmed != true) return;
 
   await PassesDB.clear();
   await PassesDB.insertAll(list);
@@ -150,8 +153,10 @@ Future<void> exportPortable() async {
 
   if (confirmed != true) return;
 
-  if (passphraseC.text.isEmpty) {
-    appShowSnackbar(message: 'Passphrase cannot be empty.');
+  final passphraseIssue =
+      CredentialPolicy.validateExportPassphrase(passphraseC.text);
+  if (passphraseIssue != null) {
+    appShowSnackbar(message: passphraseIssue);
     return;
   }
   if (passphraseC.text != confirmC.text) {
@@ -221,8 +226,7 @@ Future<void> restorePortable() async {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-              'Enter the passphrase used when this backup was created.'),
+          const Text('Enter the passphrase used when this backup was created.'),
           const SizedBox(height: 12),
           TextField(
             controller: passphraseC,
@@ -264,6 +268,20 @@ Future<void> restorePortable() async {
         .map((e) => PasswordModel.fromMap(e as Map<String, dynamic>))
         .toList();
 
+    final replaceConfirmed = await Get.defaultDialog<bool>(
+      title: 'Replace Vault?',
+      content: Text(
+        'This portable backup contains ${list.length} entries. Restoring it will replace the current vault on this device.',
+      ),
+      textConfirm: 'Replace',
+      textCancel: 'Cancel',
+      confirmTextColor: Colors.white,
+      buttonColor: Colors.red,
+      onConfirm: () => Get.back(result: true),
+      onCancel: () => Get.back(result: false),
+    );
+    if (replaceConfirmed != true) return;
+
     await PassesDB.clear();
     await PassesDB.insertAll(list);
 
@@ -288,53 +306,7 @@ Future<void> importCsv() async {
 
     final csvString = await xfile.readAsString();
 
-    final rows = CsvDecoder().convert(csvString);
-    if (rows.isEmpty) {
-      appShowSnackbar(message: 'CSV file is empty.');
-      return;
-    }
-
-    final header =
-        rows.first.map((e) => e.toString().toLowerCase().trim()).toList();
-    int titleIdx =
-        header.indexWhere((h) => h == 'title' || h == 'name' || h == 'site');
-    int usernameIdx = header.indexWhere(
-        (h) => h == 'username' || h == 'login' || h == 'email' || h == 'user');
-    int passwordIdx =
-        header.indexWhere((h) => h == 'password' || h == 'pass');
-    int urlIdx =
-        header.indexWhere((h) => h == 'url' || h == 'website' || h == 'uri');
-    int notesIdx = header
-        .indexWhere((h) => h == 'notes' || h == 'note' || h == 'comment');
-
-    final dataRows = titleIdx >= 0 ? rows.skip(1).toList() : rows;
-    if (titleIdx < 0) {
-      titleIdx = 0;
-      usernameIdx = 1;
-      passwordIdx = 2;
-      urlIdx = 3;
-      notesIdx = 4;
-    }
-
-    final models = <PasswordModel>[];
-    for (final row in dataRows) {
-      String? getValue(int idx) {
-        if (idx < 0 || idx >= row.length) return null;
-        final v = row[idx]?.toString().trim() ?? '';
-        return v.isEmpty ? null : v;
-      }
-
-      final pw = getValue(passwordIdx);
-      if (pw == null) continue;
-      models.add(PasswordModel(
-        title: getValue(titleIdx) ?? 'Imported',
-        username: getValue(usernameIdx),
-        password: pw,
-        url: getValue(urlIdx),
-        notes: getValue(notesIdx),
-        imageName: 'web',
-      ));
-    }
+    final models = CsvImportParser.parse(csvString);
 
     if (models.isEmpty) {
       appShowSnackbar(message: 'No valid entries found in CSV.');
@@ -370,12 +342,10 @@ Future<int> checkHibp(String password) async {
   final suffix = hash.substring(5);
 
   try {
-    final response = await http
-        .get(
-          Uri.parse('https://api.pwnedpasswords.com/range/$prefix'),
-          headers: {'Add-Padding': 'true'},
-        )
-        .timeout(const Duration(seconds: 5));
+    final response = await http.get(
+      Uri.parse('https://api.pwnedpasswords.com/range/$prefix'),
+      headers: {'Add-Padding': 'true'},
+    ).timeout(const Duration(seconds: 5));
 
     if (response.statusCode != 200) return 0;
 

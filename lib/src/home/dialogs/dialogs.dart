@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:otp_auth/otp_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/index.dart';
@@ -22,6 +21,7 @@ Future<void> passwordDialog({
   final notesC = TextEditingController();
   final totpC = TextEditingController();
   String? imageName = 'social';
+  var obscurePassword = true;
 
   if (model != null) {
     titleC.text = model.title ?? '';
@@ -32,6 +32,7 @@ Future<void> passwordDialog({
     totpC.text = model.totpSecret ?? '';
     imageName = model.imageName;
   }
+  String password = passwordC.text;
 
   final widget = Column(
     mainAxisSize: MainAxisSize.min,
@@ -45,13 +46,6 @@ Future<void> passwordDialog({
         ),
         child: StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
-            String password = passwordC.text;
-            passwordC.addListener(() {
-              if (passwordC.text != password) {
-                setState(() => password = passwordC.text);
-              }
-            });
-
             return Column(
               children: [
                 const Row(
@@ -183,28 +177,56 @@ Future<void> passwordDialog({
                 TextFormField(
                   controller: passwordC,
                   maxLength: 64,
+                  obscureText: obscurePassword,
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.visiblePassword,
+                  onChanged: (value) => setState(() => password = value),
                   decoration: InputDecoration(
                     counterText: '',
                     labelText: 'Password',
                     border: const OutlineInputBorder(),
                     icon: const Icon(Icons.lock),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: Get.context!,
-                          isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                    suffixIcon: SizedBox(
+                      width: 96,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            onPressed: () => setState(
+                              () => obscurePassword = !obscurePassword,
+                            ),
+                            icon: Icon(
+                              obscurePassword
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            tooltip: obscurePassword
+                                ? 'Show password'
+                                : 'Hide password',
                           ),
-                          builder: (_) => GeneratorSheet(
-                            onGenerated: (pass) => setState(() => passwordC.text = pass),
+                          IconButton(
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: Get.context!,
+                                isScrollControlled: true,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(16),
+                                  ),
+                                ),
+                                builder: (_) => GeneratorSheet(
+                                  onGenerated: (pass) => setState(() {
+                                    passwordC.text = pass;
+                                    password = pass;
+                                  }),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.tune),
+                            tooltip: 'Password generator',
                           ),
-                        );
-                      },
-                      icon: const Icon(Icons.tune),
-                      tooltip: 'Password generator',
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -283,9 +305,19 @@ Future<void> passwordDialog({
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.qr_code_scanner),
                       onPressed: () async {
-                        final result = await Get.to<String>(() => const QrScanPage());
+                        final result =
+                            await Get.to<String>(() => const QrScanPage());
                         if (result != null && result.isNotEmpty) {
-                          setState(() => totpC.text = _parseTotpSecret(result));
+                          final secret =
+                              CredentialPolicy.normalizeTotpSecret(result);
+                          if (secret == null) {
+                            appShowSnackbar(
+                              message:
+                                  'QR code does not contain a valid TOTP secret.',
+                            );
+                            return;
+                          }
+                          setState(() => totpC.text = secret);
                         }
                       },
                     ),
@@ -307,53 +339,62 @@ Future<void> passwordDialog({
           ),
           icon: const Icon(Icons.save_rounded),
           onPressed: () async {
-            if (passwordC.text.isEmpty) return;
+            final normalizedUrl = CredentialPolicy.normalizeUrl(urlC.text);
+            final normalizedTotp =
+                CredentialPolicy.normalizeTotpSecret(totpC.text);
+            final validationIssues = CredentialPolicy.validate(
+              title: titleC.text,
+              password: passwordC.text,
+              url: urlC.text,
+              totpSecret: totpC.text,
+            );
+            if (validationIssues.isNotEmpty) {
+              appShowSnackbar(message: validationIssues.first);
+              return;
+            }
 
             // Check for duplicate password
             final allEntries = HomeController.to.passesList;
             final isDuplicate = allEntries.any((e) =>
-              e.password == passwordC.text &&
-              (model == null || e.key != model.key)
-            );
+                e.password == passwordC.text &&
+                (model == null || e.key != model.key));
             if (isDuplicate) {
-              final confirmed = await Get.defaultDialog<bool>(
-                title: 'Duplicate Password',
-                content: const Text('This password is already used by another entry. Using the same password for multiple accounts is a security risk. Continue anyway?'),
-                textConfirm: 'Use Anyway',
-                textCancel: 'Change It',
-                confirmTextColor: Colors.white,
-                buttonColor: Colors.orange,
-                onConfirm: () => Get.back(result: true),
-                onCancel: () => Get.back(result: false),
-              );
-              if (confirmed != true) return;
+              final confirmed = await _confirmDuplicatePassword();
+              if (!confirmed) return;
             }
 
             if (model == null) {
               final passwordModel = PasswordModel(
-                title: titleC.text,
+                title: titleC.text.trim(),
                 password: passwordC.text,
-                username: usernameC.text,
+                username: usernameC.text.trim(),
                 imageName: imageName,
-                url: urlC.text.trim().isEmpty ? null : urlC.text.trim(),
+                url: normalizedUrl,
                 notes: notesC.text.trim().isEmpty ? null : notesC.text.trim(),
-                totpSecret: totpC.text.trim().isEmpty ? null : totpC.text.trim().toUpperCase(),
+                totpSecret: normalizedTotp,
               );
               await HomeController.to.addPassword(passwordModel);
             } else {
+              final oldPassword = model.password;
               model
-                ..title = titleC.text
+                ..title = titleC.text.trim()
                 ..password = passwordC.text
-                ..username = usernameC.text
+                ..username = usernameC.text.trim()
                 ..imageName = imageName
-                ..url = urlC.text.trim().isEmpty ? null : urlC.text.trim()
+                ..url = normalizedUrl
                 ..notes = notesC.text.trim().isEmpty ? null : notesC.text.trim()
-                ..totpSecret = totpC.text.trim().isEmpty ? null : totpC.text.trim().toUpperCase();
+                ..totpSecret = normalizedTotp;
 
-              await HomeController.to.updatePassword(model);
+              await HomeController.to.updatePassword(
+                model,
+                oldPassword: oldPassword,
+              );
             }
 
             appPopDialog();
+            appShowSnackbar(
+              message: model == null ? 'Password saved.' : 'Password updated.',
+            );
           },
         ),
       )
@@ -390,6 +431,33 @@ Future<void> deleteDialog(
       onCancel: appPopDialog,
     );
 
+Future<bool> _confirmDuplicatePassword() async {
+  final result = await showDialog<bool>(
+    context: Get.context!,
+    builder: (context) => AlertDialog(
+      title: const Text('Duplicate Password'),
+      content: const Text(
+        'This password is already used by another entry. Using the same password for multiple accounts is a security risk. Continue anyway?',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('Change It'),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.orange,
+            foregroundColor: Colors.white,
+          ),
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text('Use Anyway'),
+        ),
+      ],
+    ),
+  );
+  return result == true;
+}
+
 Future<void> settings() async {
   final canUseAuth = kIsWeb || !GetPlatform.isMobile
       ? false
@@ -401,7 +469,7 @@ Future<void> settings() async {
     hasAuth = auth == true;
   }
 
-  final hibpEnabled = appSH.getBool('hibp_enabled') ?? false;
+  final hibpEnabled = appSettingBool('hibp_enabled');
 
   await Get.bottomSheet(
     SingleChildScrollView(
@@ -571,15 +639,4 @@ Future<void> _authenticate() async {
     await appSH.setBool('auth', true);
     appPopDialog();
   }
-}
-
-String _parseTotpSecret(String input) {
-  if (input.startsWith('otpauth://')) {
-    try {
-      return OTPUri.extractSecret(input);
-    } catch (_) {
-      return input;
-    }
-  }
-  return input.trim().replaceAll(' ', '').toUpperCase();
 }

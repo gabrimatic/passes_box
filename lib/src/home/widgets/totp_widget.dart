@@ -54,6 +54,7 @@ class _TotpWidgetState extends State<TotpWidget> {
 
     return GestureDetector(
       onTap: () async {
+        if (_code == '------') return;
         HapticFeedback.lightImpact();
         await ClipboardService.copyWithAutoClear(_code);
         if (!context.mounted) return;

@@ -1,5 +1,5 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
+import '../../../core/services/password_generator_service.dart';
 import '../../../core/utils/passphrase.dart';
 import '../../../core/utils/password_strength.dart';
 import '../../../core/values/colors.dart';
@@ -29,6 +29,7 @@ class _GeneratorSheetState extends State<GeneratorSheet> {
   String _separator = '-';
 
   String _generated = '';
+  String? _error;
 
   @override
   void initState() {
@@ -38,34 +39,33 @@ class _GeneratorSheetState extends State<GeneratorSheet> {
 
   void _generate() {
     setState(() {
-      _generated = _passphraseMode ? _generatePassphrase() : _generatePassword();
+      _error = null;
+      try {
+        _generated =
+            _passphraseMode ? _generatePassphrase() : _generatePassword();
+      } on ArgumentError catch (e) {
+        _generated = '';
+        _error = e.message.toString();
+      }
     });
   }
 
   String _generatePassword() {
-    const lower = 'abcdefghijkmnopqrstuvwxyz';
-    const lowerAmbig = 'abcdefghijklmnopqrstuvwxyz';
-    const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-    const upperAmbig = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const digits = '23456789';
-    const digitsAmbig = '0123456789';
-    const symbols = '@#\$&*!?';
-
-    final charset = StringBuffer();
-    if (_useLowercase) charset.write(_excludeAmbiguous ? lower : lowerAmbig);
-    if (_useUppercase) charset.write(_excludeAmbiguous ? upper : upperAmbig);
-    if (_useDigits) charset.write(_excludeAmbiguous ? digits : digitsAmbig);
-    if (_useSymbols) charset.write(symbols);
-
-    if (charset.isEmpty) return '';
-
-    final chars = charset.toString();
-    final random = Random.secure();
-    return List.generate(_length, (_) => chars[random.nextInt(chars.length)]).join();
+    return PasswordGeneratorService.generatePassword(
+      PasswordGeneratorOptions(
+        length: _length,
+        useUppercase: _useUppercase,
+        useLowercase: _useLowercase,
+        useDigits: _useDigits,
+        useSymbols: _useSymbols,
+        excludeAmbiguous: _excludeAmbiguous,
+      ),
+    );
   }
 
   String _generatePassphrase() {
-    return PassphraseGenerator.generate(wordCount: _wordCount, separator: _separator);
+    return PassphraseGenerator.generate(
+        wordCount: _wordCount, separator: _separator);
   }
 
   @override
@@ -75,7 +75,9 @@ class _GeneratorSheetState extends State<GeneratorSheet> {
 
     return Padding(
       padding: EdgeInsets.only(
-        left: 16, right: 16, top: 16,
+        left: 16,
+        right: 16,
+        top: 16,
         bottom: MediaQuery.of(context).viewInsets.bottom + 16,
       ),
       child: Column(
@@ -84,9 +86,12 @@ class _GeneratorSheetState extends State<GeneratorSheet> {
         children: [
           Row(
             children: [
-              const Text('Generate Password', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+              const Text('Generate Password',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
               const Spacer(),
-              IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+              IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context)),
             ],
           ),
           const Divider(),
@@ -95,7 +100,12 @@ class _GeneratorSheetState extends State<GeneratorSheet> {
             children: [
               const Text('Passphrase mode'),
               const Spacer(),
-              Switch(value: _passphraseMode, onChanged: (v) { setState(() => _passphraseMode = v); _generate(); }),
+              Switch(
+                  value: _passphraseMode,
+                  onChanged: (v) {
+                    setState(() => _passphraseMode = v);
+                    _generate();
+                  }),
             ],
           ),
           if (!_passphraseMode) ...[
@@ -103,29 +113,60 @@ class _GeneratorSheetState extends State<GeneratorSheet> {
             Row(
               children: [
                 const Text('Length: '),
-                Text('$_length', style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text('$_length',
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
             Slider(
               value: _length.toDouble(),
-              min: 8, max: 64, divisions: 56,
+              min: 8,
+              max: 64,
+              divisions: 56,
               label: '$_length',
-              onChanged: (v) { setState(() => _length = v.round()); _generate(); },
+              onChanged: (v) {
+                setState(() => _length = v.round());
+                _generate();
+              },
             ),
             // Charset toggles
             Wrap(
               spacing: 8,
               children: [
-                FilterChip(label: const Text('A–Z'), selected: _useUppercase,
-                  onSelected: (v) { setState(() => _useUppercase = v); _generate(); }),
-                FilterChip(label: const Text('a–z'), selected: _useLowercase,
-                  onSelected: (v) { setState(() => _useLowercase = v); _generate(); }),
-                FilterChip(label: const Text('0–9'), selected: _useDigits,
-                  onSelected: (v) { setState(() => _useDigits = v); _generate(); }),
-                FilterChip(label: const Text('#@!'), selected: _useSymbols,
-                  onSelected: (v) { setState(() => _useSymbols = v); _generate(); }),
-                FilterChip(label: const Text('No ambiguous'), selected: _excludeAmbiguous,
-                  onSelected: (v) { setState(() => _excludeAmbiguous = v); _generate(); }),
+                FilterChip(
+                    label: const Text('A–Z'),
+                    selected: _useUppercase,
+                    onSelected: (v) {
+                      setState(() => _useUppercase = v);
+                      _generate();
+                    }),
+                FilterChip(
+                    label: const Text('a–z'),
+                    selected: _useLowercase,
+                    onSelected: (v) {
+                      setState(() => _useLowercase = v);
+                      _generate();
+                    }),
+                FilterChip(
+                    label: const Text('0–9'),
+                    selected: _useDigits,
+                    onSelected: (v) {
+                      setState(() => _useDigits = v);
+                      _generate();
+                    }),
+                FilterChip(
+                    label: const Text('#@!'),
+                    selected: _useSymbols,
+                    onSelected: (v) {
+                      setState(() => _useSymbols = v);
+                      _generate();
+                    }),
+                FilterChip(
+                    label: const Text('No ambiguous'),
+                    selected: _excludeAmbiguous,
+                    onSelected: (v) {
+                      setState(() => _excludeAmbiguous = v);
+                      _generate();
+                    }),
               ],
             ),
           ] else ...[
@@ -133,31 +174,57 @@ class _GeneratorSheetState extends State<GeneratorSheet> {
             Row(
               children: [
                 const Text('Words: '),
-                Text('$_wordCount', style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text('$_wordCount',
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
             Slider(
               value: _wordCount.toDouble(),
-              min: 3, max: 8, divisions: 5,
+              min: 3,
+              max: 8,
+              divisions: 5,
               label: '$_wordCount',
-              onChanged: (v) { setState(() => _wordCount = v.round()); _generate(); },
+              onChanged: (v) {
+                setState(() => _wordCount = v.round());
+                _generate();
+              },
             ),
             // Separator
             Row(
               children: [
                 const Text('Separator: '),
                 const SizedBox(width: 8),
-                ChoiceChip(label: const Text('-'), selected: _separator == '-',
-                  onSelected: (_) { setState(() => _separator = '-'); _generate(); }),
+                ChoiceChip(
+                    label: const Text('-'),
+                    selected: _separator == '-',
+                    onSelected: (_) {
+                      setState(() => _separator = '-');
+                      _generate();
+                    }),
                 const SizedBox(width: 4),
-                ChoiceChip(label: const Text('.'), selected: _separator == '.',
-                  onSelected: (_) { setState(() => _separator = '.'); _generate(); }),
+                ChoiceChip(
+                    label: const Text('.'),
+                    selected: _separator == '.',
+                    onSelected: (_) {
+                      setState(() => _separator = '.');
+                      _generate();
+                    }),
                 const SizedBox(width: 4),
-                ChoiceChip(label: const Text('_'), selected: _separator == '_',
-                  onSelected: (_) { setState(() => _separator = '_'); _generate(); }),
+                ChoiceChip(
+                    label: const Text('_'),
+                    selected: _separator == '_',
+                    onSelected: (_) {
+                      setState(() => _separator = '_');
+                      _generate();
+                    }),
                 const SizedBox(width: 4),
-                ChoiceChip(label: const Text(' '), selected: _separator == ' ',
-                  onSelected: (_) { setState(() => _separator = ' '); _generate(); }),
+                ChoiceChip(
+                    label: const Text(' '),
+                    selected: _separator == ' ',
+                    onSelected: (_) {
+                      setState(() => _separator = ' ');
+                      _generate();
+                    }),
               ],
             ),
           ],
@@ -172,8 +239,12 @@ class _GeneratorSheetState extends State<GeneratorSheet> {
               border: Border.all(color: Colors.grey.shade300),
             ),
             child: Text(
-              _generated,
-              style: const TextStyle(fontSize: 16, fontFamily: 'monospace'),
+              _error ?? _generated,
+              style: TextStyle(
+                fontSize: 16,
+                fontFamily: _error == null ? 'monospace' : null,
+                color: _error == null ? null : Colors.red,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
@@ -183,12 +254,14 @@ class _GeneratorSheetState extends State<GeneratorSheet> {
             LinearProgressIndicator(
               value: score,
               backgroundColor: Colors.grey.shade200,
-              valueColor: AlwaysStoppedAnimation(PasswordStrengthUtil.color(strength)),
+              valueColor:
+                  AlwaysStoppedAnimation(PasswordStrengthUtil.color(strength)),
             ),
             const SizedBox(height: 2),
             Text(
               PasswordStrengthUtil.label(strength),
-              style: TextStyle(fontSize: 12, color: PasswordStrengthUtil.color(strength)),
+              style: TextStyle(
+                  fontSize: 12, color: PasswordStrengthUtil.color(strength)),
             ),
           ],
           const SizedBox(height: 16),
@@ -210,10 +283,12 @@ class _GeneratorSheetState extends State<GeneratorSheet> {
                     backgroundColor: appColor2,
                     foregroundColor: Colors.white,
                   ),
-                  onPressed: () {
-                    widget.onGenerated(_generated);
-                    Navigator.pop(context);
-                  },
+                  onPressed: _generated.isEmpty
+                      ? null
+                      : () {
+                          widget.onGenerated(_generated);
+                          Navigator.pop(context);
+                        },
                 ),
               ),
             ],

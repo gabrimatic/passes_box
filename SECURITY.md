@@ -12,8 +12,8 @@ Password records are encrypted at rest with AES-256-GCM. Every ciphertext carrie
 | Key storage | Platform secure storage (Keychain, Android Keystore, localStorage) |
 | Database encryption | AES-256-GCM, 12-byte nonce + 16-byte auth tag per record |
 | Device backup (`.pbb`) | AES-256-GCM with the device key, 12-byte nonce + 16-byte auth tag |
-| Portable backup (`.pbbx`) | Argon2id (m=4096 KiB, t=3, p=1) → AES-256-GCM |
-| QR export (`pbbentry2:`) | Argon2id (m=4096 KiB, t=3, p=1) → AES-256-GCM |
+| Portable backup (`.pbbx`) | Argon2id (m=4096 KiB, t=3, p=1) -> AES-256-GCM |
+| QR export (`pbbentry2:`) | Argon2id (m=4096 KiB, t=3, p=1) -> AES-256-GCM |
 
 ### Why AES-256-GCM
 
@@ -40,6 +40,7 @@ Web storage is weaker than native secure storage. The encryption key is stored i
 - No analytics, telemetry, or crash reporting.
 - No cloud sync. Vault data stays on the device.
 - No clipboard persistence. Passwords, password history entries, and TOTP codes clear after 30 seconds if the clipboard still contains the copied value.
+- No automatic secret copy on save. Copying a password or TOTP code is an explicit action.
 - No hardcoded keys or static nonces.
 - No unauthenticated ciphertext.
 
@@ -62,6 +63,7 @@ Same scheme as the portable backup: Argon2id plus AES-256-GCM, applied to one en
 - `android:allowBackup="false"` prevents Android's automatic backup from capturing the database.
 - Biometric authentication uses the `USE_BIOMETRIC` permission.
 - `FLAG_SECURE` blocks screenshots and task-switcher previews.
+- Backups and imports use system pick/save surfaces instead of broad external storage permissions.
 
 ## iOS and macOS
 

@@ -13,3 +13,6 @@ export 'package:passes_box/core/utils/password_strength.dart';
 export 'package:passes_box/core/utils/passphrase.dart';
 export 'package:passes_box/core/services/clipboard_service.dart';
 export 'package:passes_box/core/services/lock_service.dart';
+export 'package:passes_box/core/services/password_generator_service.dart';
+export 'package:passes_box/core/utils/credential_policy.dart';
+export 'package:passes_box/core/utils/csv_import_parser.dart';

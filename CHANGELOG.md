@@ -6,10 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Vault health summary on the home screen for weak, reused, and old passwords.
+- Shared credential policy for title, URL, TOTP, export passphrase, and vault audit checks.
+- Tested CSV import parser for common Chrome, Bitwarden, 1Password, and generic column names.
+- CI now runs `flutter test` before release builds.
+
+### Changed
+
+- Saving a credential no longer copies its password automatically. Copying secrets is now explicit.
+- Password generation now guarantees every selected character class appears in the generated password.
+- Credential entry now hides passwords by default and validates URL and TOTP fields before saving.
+- Restore flows now ask before replacing the current vault.
+- CSV import now normalizes safe URLs, TOTP secrets, and imported categories.
+- Android backup/import no longer requests broad external storage permissions.
+
 ### Fixed
 
 - Clipboard auto-clear now covers password-card copies, password history copies, and TOTP code copies.
 - In-app version label now matches the `2.2.0` release.
+- Editing a password now records the previous password in password history again.
+- Password age warnings now use the last password update time instead of only the entry creation time.
 
 ## [2.2.0] - 2026-04-30
 

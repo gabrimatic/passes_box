@@ -45,17 +45,27 @@ class _PassesBoxAppState extends State<PassesBoxApp>
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'PassesBox',
-      initialRoute: SplashPage.name,
-      getPages: AppPages.getPages,
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'raleway',
-        colorSchemeSeed: Colors.deepPurple,
-        primaryColor: appColor3,
-        primaryColorDark: appColor4,
+    return Listener(
+      onPointerDown: (_) => _recordActivity(),
+      onPointerMove: (_) => _recordActivity(),
+      child: GetMaterialApp(
+        title: 'PassesBox',
+        initialRoute: SplashPage.name,
+        getPages: AppPages.getPages,
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          fontFamily: 'raleway',
+          colorSchemeSeed: Colors.deepPurple,
+          primaryColor: appColor3,
+          primaryColorDark: appColor4,
+        ),
       ),
     );
+  }
+
+  void _recordActivity() {
+    if (!kIsWeb && GetPlatform.isMobile) {
+      LockService.to.resetTimer();
+    }
   }
 }

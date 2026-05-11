@@ -33,35 +33,31 @@ class SearchSortBar extends StatelessWidget {
             onChanged: (v) => controller.searchQuery.value = v,
           ),
         ),
-        Obx(
-          () => SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            child: Row(
-              children: [
-                _SortChip(
-                    label: 'Newest', value: 'newest', controller: controller),
-                _SortChip(
-                    label: 'Oldest', value: 'oldest', controller: controller),
-                _SortChip(label: 'A–Z', value: 'az', controller: controller),
-                _SortChip(label: 'Z–A', value: 'za', controller: controller),
-                const SizedBox(width: 12),
-                _CategoryChip(
-                    label: 'All', value: 'all', controller: controller),
-                _CategoryChip(
-                    label: 'Bank', value: 'bank', controller: controller),
-                _CategoryChip(
-                    label: 'Card', value: 'card', controller: controller),
-                _CategoryChip(
-                    label: 'Email', value: 'email', controller: controller),
-                _CategoryChip(
-                    label: 'Social', value: 'social', controller: controller),
-                _CategoryChip(
-                    label: 'Web', value: 'web', controller: controller),
-                _CategoryChip(
-                    label: 'Wi-Fi', value: 'wifi', controller: controller),
-              ],
-            ),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          child: Row(
+            children: [
+              _SortChip(
+                  label: 'Newest', value: 'newest', controller: controller),
+              _SortChip(
+                  label: 'Oldest', value: 'oldest', controller: controller),
+              _SortChip(label: 'A–Z', value: 'az', controller: controller),
+              _SortChip(label: 'Z–A', value: 'za', controller: controller),
+              const SizedBox(width: 12),
+              _CategoryChip(label: 'All', value: 'all', controller: controller),
+              _CategoryChip(
+                  label: 'Bank', value: 'bank', controller: controller),
+              _CategoryChip(
+                  label: 'Card', value: 'card', controller: controller),
+              _CategoryChip(
+                  label: 'Email', value: 'email', controller: controller),
+              _CategoryChip(
+                  label: 'Social', value: 'social', controller: controller),
+              _CategoryChip(label: 'Web', value: 'web', controller: controller),
+              _CategoryChip(
+                  label: 'Wi-Fi', value: 'wifi', controller: controller),
+            ],
           ),
         ),
       ],

@@ -74,7 +74,7 @@ class _QrImportPageState extends State<QrImportPage> {
       url: map['url'] as String?,
       notes: map['notes'] as String?,
       totpSecret: map['totpSecret'] as String?,
-      imageName: 'social',
+      imageName: map['imageName'] as String? ?? 'social',
     );
   }
 
@@ -124,13 +124,11 @@ class _QrImportPageState extends State<QrImportPage> {
                     controller: _passphraseC,
                     obscureText: true,
                     decoration: const InputDecoration(
-                        labelText: 'Passphrase',
-                        border: OutlineInputBorder()),
+                        labelText: 'Passphrase', border: OutlineInputBorder()),
                   ),
                   if (_errorMsg != null) ...[
                     const SizedBox(height: 8),
-                    Text(_errorMsg!,
-                        style: const TextStyle(color: Colors.red)),
+                    Text(_errorMsg!, style: const TextStyle(color: Colors.red)),
                   ],
                   const SizedBox(height: 16),
                   SizedBox(

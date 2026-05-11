@@ -13,16 +13,19 @@ class CenterTheWidget extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => kIsWeb
-      ? Container(
-          alignment: Alignment.center,
-          width: Get.width,
-          child: SizedBox(
-            width: appGetWidth,
-            child: child,
-          ),
-        )
-      : child;
+  Widget build(BuildContext context) {
+    if (!kIsWeb) return child;
+
+    final width = MediaQuery.sizeOf(context).width;
+    return Container(
+      alignment: Alignment.center,
+      width: width,
+      child: SizedBox(
+        width: width > 600 ? 600 : width,
+        child: child,
+      ),
+    );
+  }
 }
 
 void appShowSnackbar({required String message}) => Get.showSnackbar(

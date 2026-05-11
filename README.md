@@ -24,7 +24,8 @@ It keeps credentials in an encrypted sembast database and runs offline by defaul
 - Device key: 256-bit key generated with `Random.secure()` and stored in platform secure storage
 - Portable exports: passphrase-protected `.pbbx` backups and QR exports using Argon2id
 - Mobile lock: biometric authentication on Android and iOS when the device supports it
-- Password tools: secure generator, password history, age warnings, duplicate detection, and TOTP codes
+- Password tools: secure generator, password history, vault health warnings, duplicate detection, and TOTP codes
+- Safer entry flow: required titles, hidden password entry, URL and TOTP validation, and explicit copy actions
 - Clipboard guard: copied passwords, password history entries, and TOTP codes clear after 30 seconds if unchanged
 - Import and restore: device-locked `.pbb` backups, portable `.pbbx` backups, QR import, and CSV import
 - Network boundary: no telemetry, no cloud sync, and no credential uploads
@@ -59,6 +60,8 @@ PassesBox is built around a narrow security model: keep the vault local, encrypt
 - **QR export (`pbbentry2:`):** Same Argon2id + AES-GCM scheme as the portable backup, per-entry.
 
 No hardcoded keys. No static nonces. No unauthenticated ciphertext. No plaintext vault records at rest.
+
+PassesBox also keeps secret handling explicit in the UI. Saving a credential does not copy the password automatically, imports normalize URLs and TOTP secrets, restore flows ask before replacing the vault, and the home screen surfaces weak, reused, and old passwords.
 
 ### Key storage by platform
 
@@ -119,6 +122,15 @@ lib/
 │   ├── navigation/
 │   │   ├── get_pages.dart
 │   │   └── navigation.dart
+│   ├── services/
+│   │   ├── clipboard_service.dart
+│   │   ├── lock_service.dart
+│   │   └── password_generator_service.dart
+│   ├── utils/
+│   │   ├── credential_policy.dart # validation and vault health checks
+│   │   ├── csv_import_parser.dart
+│   │   ├── passphrase.dart
+│   │   └── password_strength.dart
 │   ├── values/
 │   │   ├── colors.dart
 │   │   ├── strings.dart
@@ -161,6 +173,13 @@ Biometric auth is only available on Android and iOS. On macOS and Web it is disa
 <summary>Backup restore fails or produces garbled data</summary>
 
 `.pbb` files are encrypted with the device key at the time of export. Restoring on a different device, or after reinstalling the app, will fail with "Invalid or incompatible backup file." Use a passphrase-protected `.pbbx` backup to move data between devices.
+
+</details>
+
+<details>
+<summary>Imported CSV entries are missing optional fields</summary>
+
+PassesBox imports rows that contain a password. Optional URL and TOTP fields are normalized before saving, and unsafe or malformed optional fields are skipped instead of being stored. The importer understands common Chrome, Bitwarden, 1Password, and generic column names.
 
 </details>
 

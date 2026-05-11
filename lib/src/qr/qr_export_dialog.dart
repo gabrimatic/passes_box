@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../core/values/colors.dart';
+import '../../core/utils/credential_policy.dart';
 import '../../core/models/password.dart';
 import '../../core/navigation/navigation.dart';
 
@@ -15,6 +16,7 @@ Future<void> showQrExportDialog(PasswordModel model) async {
   final passphraseC = TextEditingController();
   String? qrData;
   String? errorMsg;
+  var obscurePassphrase = true;
 
   await Get.bottomSheet(
     StatefulBuilder(
@@ -38,8 +40,7 @@ Future<void> showQrExportDialog(PasswordModel model) async {
                           TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                   const Spacer(),
                   IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: appPopDialog),
+                      icon: const Icon(Icons.close), onPressed: appPopDialog),
                 ],
               ),
               const Divider(),
@@ -49,17 +50,31 @@ Future<void> showQrExportDialog(PasswordModel model) async {
                 const SizedBox(height: 12),
                 TextField(
                   controller: passphraseC,
+                  obscureText: obscurePassphrase,
                   decoration: const InputDecoration(
                     labelText: 'Passphrase',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.lock),
+                  ).copyWith(
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        obscurePassphrase
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                      ),
+                      tooltip: obscurePassphrase
+                          ? 'Show passphrase'
+                          : 'Hide passphrase',
+                      onPressed: () => setState(
+                        () => obscurePassphrase = !obscurePassphrase,
+                      ),
+                    ),
                   ),
                 ),
                 if (errorMsg != null) ...[
                   const SizedBox(height: 8),
                   Text(errorMsg!,
-                      style:
-                          const TextStyle(color: Colors.red, fontSize: 12)),
+                      style: const TextStyle(color: Colors.red, fontSize: 12)),
                 ],
                 const SizedBox(height: 16),
                 SizedBox(
@@ -72,8 +87,12 @@ Future<void> showQrExportDialog(PasswordModel model) async {
                       foregroundColor: Colors.white,
                     ),
                     onPressed: () async {
-                      if (passphraseC.text.isEmpty) {
-                        setState(() => errorMsg = 'Passphrase required.');
+                      final passphraseIssue =
+                          CredentialPolicy.validateExportPassphrase(
+                        passphraseC.text,
+                      );
+                      if (passphraseIssue != null) {
+                        setState(() => errorMsg = passphraseIssue);
                         return;
                       }
                       try {
@@ -127,6 +146,7 @@ Future<String> _encryptEntry(PasswordModel model, String passphrase) async {
     'title': model.title,
     'username': model.username,
     'password': model.password,
+    'imageName': model.imageName,
     'url': model.url,
     'notes': model.notes,
     'totpSecret': model.totpSecret,

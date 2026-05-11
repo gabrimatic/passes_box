@@ -97,8 +97,11 @@ class PassesDB {
   }
 
   static Future<void> insertAll(List<PasswordModel> models) async {
+    final now = DateTime.now();
     await _db.transaction((txn) async {
       for (final model in models) {
+        model.createdAt ??= now;
+        model.updatedAt ??= model.createdAt ?? now;
         await _store.add(txn, model.toMap());
       }
     });

@@ -66,6 +66,8 @@ flutter analyze
 flutter test
 ```
 
+CI runs both commands before Android and Web builds. Changes to credential parsing, generation, validation, restore behavior, or clipboard handling should include focused tests for the behavior being changed.
+
 ## Building
 
 | Platform | Command |

@@ -3,6 +3,7 @@ import '../controller/controller.dart';
 import '../dialogs/dialogs.dart';
 import '../widgets/password_card.dart';
 import '../widgets/search_sort_bar.dart';
+import '../widgets/vault_health_summary.dart';
 
 class HomePage extends StatelessWidget {
   static const name = '/index.html';
@@ -22,6 +23,7 @@ class HomePage extends StatelessWidget {
               child: Column(
                 children: [
                   const SearchSortBar(),
+                  VaultHealthSummary(issues: controller.auditIssues),
                   Wrap(
                     crossAxisAlignment: WrapCrossAlignment.center,
                     alignment: WrapAlignment.center,
