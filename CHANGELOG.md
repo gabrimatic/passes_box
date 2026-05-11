@@ -8,16 +8,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
-- Clipboard auto-clear now applies consistently to password-card copies, password history copies, and TOTP code copies.
+- Clipboard auto-clear now covers password-card copies, password history copies, and TOTP code copies.
 - In-app version label now matches the `2.2.0` release.
 
 ## [2.2.0] - 2026-04-30
 
 ### Changed
 
-- Encryption upgraded from AES-256-CBC (no authentication) to AES-256-GCM throughout. Every ciphertext now carries a 16-byte authentication tag; tampered or corrupted data is rejected before decryption.
+- Encryption upgraded from AES-256-CBC without authentication to AES-256-GCM throughout. Every ciphertext now carries a 16-byte authentication tag, so tampered or corrupted data is rejected before decryption.
 - Database codec signature updated to `passes_box_gcm`. Existing databases are incompatible and must be re-imported.
-- Device backup format (`.pbb`): nonce reduced from 16 to 12 bytes (GCM standard); authentication tag appended. Old `.pbb` files are not compatible.
+- Device backup format (`.pbb`): nonce reduced from 16 to 12 bytes for GCM; authentication tag appended. Old `.pbb` files are not compatible.
 - Portable backup format (`.pbbx`): key derivation changed from PBKDF2-SHA256 (100k iterations) to Argon2id (m=4096 KiB, t=3, p=1). Version byte removed. Old `.pbbx` files are not compatible.
 - QR export format (`pbbentry2:`): key derivation changed from PBKDF2-SHA256 (10k iterations) to Argon2id. Old `pbbentry:` QR codes are not scannable by this version.
 
@@ -34,14 +34,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Password strength indicator in the entry dialog
 - Configurable password generator: length slider, charset toggles (uppercase, lowercase, digits, symbols, no-ambiguous), passphrase mode with word count and separator
 - Duplicate password detection with confirmation prompt
-- TOTP / 2FA support: store a TOTP secret, generate live codes with countdown ring, scan QR to populate
+- TOTP / 2FA support: store a TOTP secret, generate live codes with a countdown ring, and scan QR codes to populate the secret
 - Recycle bin: deleted entries are soft-deleted and auto-purged after 30 days
 - Password history: last 5 passwords per entry, accessible from the card
 - Portability-safe backup (.pbbx): AES-256-CBC encrypted with a user passphrase via PBKDF2, restorable on any device
 - CSV import: auto-detects columns, supports Bitwarden, 1Password, Chrome, and generic formats
 - HIBP breach check (opt-in): checks passwords against the Have I Been Pwned database using k-anonymity
 - QR code export/import: encrypt a single entry with a passphrase and share via QR
-- Clipboard auto-clear: copied passwords are cleared from the clipboard after 30 seconds
+- Clipboard auto-clear: copied passwords are cleared after 30 seconds
 - Auto-lock: app locks after 5 minutes of inactivity on mobile
 - Failed authentication limit: 3 failed biometric attempts trigger a 30-second lockout with countdown
 - Screenshot prevention: Android FLAG_SECURE blocks screenshots and task-switcher previews; iOS shows a privacy overlay
@@ -61,7 +61,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Restore operation is now atomic: parses before clearing existing data
 - Android target/compile SDK upgraded to 36
 - Android Gradle Plugin upgraded to 8.9.1, Gradle to 8.12
-- Web bootstrap modernized to `flutter_bootstrap.js` (replaces deprecated service worker pattern)
+- Web bootstrap moved to `flutter_bootstrap.js`, replacing the deprecated service worker pattern
 - macOS entitlements cleaned up: added `network.client`, removed unnecessary `keychain-access-groups`
 - iOS Info.plist: disabled file sharing and document browsing for security
 - HomeController database operations are now properly awaited
@@ -77,7 +77,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 
 - `File.fromRawPath` bug in restore (was passing file content as path)
-- Force-unwraps on nullable PasswordModel fields replaced with null-safe defaults
+- Force unwraps on nullable PasswordModel fields replaced with null-safe defaults
 - `HomeController.to` changed from `static final` to getter (was evaluated too early)
 - `indexWhere` guarded against -1 return value
 - Android `android:exported` added for Android 12+ compatibility

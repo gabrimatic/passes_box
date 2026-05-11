@@ -8,9 +8,9 @@
 [![Flutter 3.x+](https://img.shields.io/badge/Flutter-3.x%2B-54C5F8.svg)](https://flutter.dev)
 [![Dart 3.x+](https://img.shields.io/badge/Dart-3.x%2B-0175C2.svg)](https://dart.dev)
 
-Offline-first password manager with AES-256-GCM encryption and biometric access. No network dependency.
+PassesBox is a local password manager with AES-256-GCM encryption, biometric access on mobile, and encrypted backups for moving data when you need to.
 
-PassesBox stores credentials in an encrypted local database. It generates strong passwords on demand, locks behind biometrics on mobile, and supports encrypted `.pbb` backup files for moving data between devices.
+It keeps credentials in an encrypted sembast database and runs offline by default. The optional breach check uses k-anonymity, so the app never sends a full password hash.
 
 <p align="center">
   <img src="assets/screenshot.png" width="600" alt="PassesBox screenshot">
@@ -20,16 +20,15 @@ PassesBox stores credentials in an encrypted local database. It generates strong
 
 ## Features
 
-- AES-256-GCM authenticated encryption with a random per-device key
-- Random 12-byte nonce per operation via `Random.secure()`; every ciphertext carries a 16-byte authentication tag
-- Encrypted sembast database; records are encrypted and authenticated at rest
-- Argon2id key derivation for all passphrase-protected exports (portable backup, QR)
-- Biometric authentication gate (fingerprint, Face ID) on mobile
-- Password generator (16 characters, mixed charset, cryptographically secure RNG)
-- Clipboard auto-clear for copied passwords, password history entries, and TOTP codes
-- Encrypted backup and restore via `.pbb` files (device key) and `.pbbx` files (user passphrase)
-- Offline by default. No telemetry. Optional HIBP breach checks use k-anonymity and never send a full password hash.
-- Cross-platform: Android, iOS, macOS, Web
+- Local vault: encrypted sembast database with AES-256-GCM authenticated encryption
+- Device key: 256-bit key generated with `Random.secure()` and stored in platform secure storage
+- Portable exports: passphrase-protected `.pbbx` backups and QR exports using Argon2id
+- Mobile lock: biometric authentication on Android and iOS when the device supports it
+- Password tools: secure generator, password history, age warnings, duplicate detection, and TOTP codes
+- Clipboard guard: copied passwords, password history entries, and TOTP codes clear after 30 seconds if unchanged
+- Import and restore: device-locked `.pbb` backups, portable `.pbbx` backups, QR import, and CSV import
+- Network boundary: no telemetry, no cloud sync, and no credential uploads
+- Platforms: Android, iOS, macOS, and Web
 
 ---
 
@@ -47,11 +46,11 @@ PassesBox stores credentials in an encrypted local database. It generates strong
 
 ## Security
 
-PassesBox does not transmit data. Everything stays on device.
+PassesBox is built around a narrow security model: keep the vault local, encrypt records before they touch disk, and make backup formats explicit.
 
 ### Encryption architecture
 
-- **Algorithm:** AES-256-GCM (authenticated encryption). Every ciphertext has a 16-byte authentication tag — tampered or corrupted data is detected and rejected before decryption.
+- **Algorithm:** AES-256-GCM authenticated encryption. Every ciphertext has a 16-byte authentication tag, so tampered or corrupted data is rejected before decryption.
 - **Key:** 256-bit key generated once with `Random.secure()`, stored in platform secure storage
 - **Nonce:** 12 random bytes per operation, unique per record
 - **Database:** sembast with a custom `SembastCodec`. Every record is AES-GCM encrypted before writing to disk.
@@ -59,7 +58,7 @@ PassesBox does not transmit data. Everything stays on device.
 - **Portable backup (`.pbbx`):** AES-GCM encrypted with a key derived from a user passphrase via Argon2id (m=4096 KiB, t=3, p=1). Restorable on any device.
 - **QR export (`pbbentry2:`):** Same Argon2id + AES-GCM scheme as the portable backup, per-entry.
 
-No hardcoded keys. No static nonces. No unauthenticated ciphertext. No plaintext at rest.
+No hardcoded keys. No static nonces. No unauthenticated ciphertext. No plaintext vault records at rest.
 
 ### Key storage by platform
 
@@ -70,7 +69,7 @@ No hardcoded keys. No static nonces. No unauthenticated ciphertext. No plaintext
 | Android | Android Keystore via `flutter_secure_storage` |
 | Web | `localStorage` (browser-managed) |
 
-> **Backup portability:** A `.pbb` file created on one device can only be restored on the same device (same key). Migrating to a new device requires re-exporting from the source device while the key is still accessible.
+> **Backup portability:** A `.pbb` file created on one device can only be restored on that device. Use a `.pbbx` portable backup when moving to a new device.
 
 ---
 
@@ -85,7 +84,7 @@ No hardcoded keys. No static nonces. No unauthenticated ciphertext. No plaintext
 
 ---
 
-## Building from Source
+## Building From Source
 
 ```bash
 git clone https://github.com/gabrimatic/passes_box.git
@@ -94,7 +93,7 @@ flutter pub get
 flutter run
 ```
 
-### Platform-specific build commands
+### Platform Build Commands
 
 | Platform | Command |
 |----------|---------|
@@ -154,21 +153,21 @@ lib/
 <details>
 <summary>Biometric authentication not working</summary>
 
-Biometric auth is only available on Android and iOS. On macOS and Web it is disabled by design. Make sure the device has at least one enrolled fingerprint or Face ID profile. The app checks `localAuth.isDeviceSupported()` at runtime and silently skips the auth gate if the device reports no support.
+Biometric auth is only available on Android and iOS. On macOS and Web it is disabled by design. Make sure the device has at least one enrolled fingerprint or Face ID profile. The app checks `localAuth.isDeviceSupported()` at runtime and skips the auth gate when the device reports no support.
 
 </details>
 
 <details>
 <summary>Backup restore fails or produces garbled data</summary>
 
-`.pbb` files are encrypted with the device key at the time of export. Restoring on a different device, or after reinstalling the app (which regenerates the key), will fail with "Invalid or incompatible backup file." Use a `.pbbx` portable backup (protected by a passphrase) to move data between devices. Always restore on the same device that created the `.pbb` backup, or export a portable backup before reinstalling.
+`.pbb` files are encrypted with the device key at the time of export. Restoring on a different device, or after reinstalling the app, will fail with "Invalid or incompatible backup file." Use a passphrase-protected `.pbbx` backup to move data between devices.
 
 </details>
 
 <details>
 <summary>Web storage limitations</summary>
 
-On Web, the encryption key is stored in `localStorage`. Clearing browser storage or switching browsers will make existing data inaccessible. Export a backup before clearing site data and restore after re-establishing the session in the same browser.
+On Web, the encryption key is stored in `localStorage`. Clearing browser storage or switching browsers can make existing data inaccessible. Export a backup before clearing site data.
 
 </details>
 

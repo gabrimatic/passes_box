@@ -1,5 +1,5 @@
 name: passes_box
-description: Offline password manager with AES-256 encryption, biometric auth, and encrypted backup. Android, iOS, macOS, and Web.
+description: Local password manager with AES-256-GCM encryption, biometric auth, and encrypted backups for Android, iOS, macOS, and Web.
 homepage: https://github.com/gabrimatic/passes_box
 
 version: 2.2.0+4

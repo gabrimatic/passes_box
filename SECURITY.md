@@ -1,10 +1,10 @@
 # Security
 
-PassesBox is a password manager. Security is the entire point.
+PassesBox is a password manager, so the security model needs to be clear.
 
 ## Encryption Architecture
 
-All password records are encrypted at rest using AES-256-GCM. Every ciphertext carries a 16-byte authentication tag, so tampered or corrupted data is detected and rejected before decryption. The encryption key is a 256-bit random key generated once per device installation and stored in the platform's secure storage.
+Password records are encrypted at rest with AES-256-GCM. Every ciphertext carries a 16-byte authentication tag, so tampered or corrupted data is rejected before decryption. The encryption key is a 256-bit random key generated once per device installation and stored in the platform's secure storage.
 
 | Layer | Mechanism |
 | --- | --- |
@@ -17,11 +17,11 @@ All password records are encrypted at rest using AES-256-GCM. Every ciphertext c
 
 ### Why AES-256-GCM
 
-GCM is an authenticated encryption mode. Unlike CBC, it detects any modification to the ciphertext before producing plaintext. A corrupted backup or tampered database record will fail decryption with a MAC error rather than silently producing garbage.
+GCM is an authenticated encryption mode. Unlike CBC, it detects changes to ciphertext before producing plaintext. A corrupted backup or tampered database record fails decryption instead of producing garbage.
 
 ### Why Argon2id
 
-Argon2id is the winner of the Password Hashing Competition and the current OWASP-recommended algorithm for password-based key derivation. Its memory-hard design makes GPU and ASIC brute-force attacks significantly more expensive than PBKDF2 or bcrypt.
+Argon2id is the current OWASP-recommended algorithm for password-based key derivation. Its memory-hard design makes GPU and ASIC brute-force attacks more expensive than PBKDF2 or bcrypt.
 
 ## Platform Key Storage
 
@@ -32,14 +32,14 @@ Argon2id is the winner of the Password Hashing Competition and the current OWASP
 | Android | Android Keystore (EncryptedSharedPreferences) |
 | Web | localStorage (browser sandbox) |
 
-Web storage is inherently less secure than native platforms. The encryption key is stored in localStorage, which is accessible to JavaScript running on the same origin.
+Web storage is weaker than native secure storage. The encryption key is stored in localStorage, which is accessible to JavaScript running on the same origin.
 
-## What PassesBox Does Not Do
+## Boundaries
 
 - No credential uploads. The optional HIBP breach check sends only the first 5 characters of a SHA-1 password hash to the Pwned Passwords API.
 - No analytics, telemetry, or crash reporting.
-- No cloud sync. Data stays on the device.
-- No clipboard persistence. Passwords, password history entries, and TOTP codes are cleared by the app after 30 seconds if the clipboard still contains the copied value.
+- No cloud sync. Vault data stays on the device.
+- No clipboard persistence. Passwords, password history entries, and TOTP codes clear after 30 seconds if the clipboard still contains the copied value.
 - No hardcoded keys or static nonces.
 - No unauthenticated ciphertext.
 
@@ -47,15 +47,15 @@ Web storage is inherently less secure than native platforms. The encryption key 
 
 ### Device backup (`.pbb`)
 
-Encrypted with the device key. Can only be restored on the same device (or a device with the same key). If the app is uninstalled, the key is lost and the backup becomes unreadable.
+Encrypted with the device key. It can only be restored on the same device, or a device with the same key. If the app is uninstalled and the key is lost, the backup becomes unreadable.
 
 ### Portable backup (`.pbbx`)
 
-Encrypted with a key derived from a user-chosen passphrase using Argon2id. Restorable on any device with the passphrase. Security is proportional to passphrase strength.
+Encrypted with a key derived from a user-chosen passphrase using Argon2id. It can be restored on any device with the passphrase. Security depends on passphrase strength.
 
 ### QR entry export
 
-Same scheme as the portable backup — Argon2id + AES-256-GCM — applied per entry. The passphrase is required to import on the receiving device.
+Same scheme as the portable backup: Argon2id plus AES-256-GCM, applied to one entry. The passphrase is required to import on the receiving device.
 
 ## Android
 
@@ -65,17 +65,17 @@ Same scheme as the portable backup — Argon2id + AES-256-GCM — applied per en
 
 ## iOS and macOS
 
-- File sharing and document browsing are disabled in Info.plist.
+- File sharing and document browsing are disabled in `Info.plist`.
 - App sandbox is enabled with minimal entitlements.
 - A privacy overlay is shown when the app moves to the background.
 
 ## Vulnerability Reporting
 
-If you find a security issue, please report it privately:
+If you find a security issue, report it privately:
 
 1. Open a [GitHub Security Advisory](https://github.com/gabrimatic/passes_box/security/advisories/new)
-2. Include steps to reproduce, expected behavior, and impact assessment
-3. Allow up to 48 hours for initial response
+2. Include steps to reproduce, expected behavior, and impact
+3. Allow up to 48 hours for an initial response
 
 Do not open public issues for security vulnerabilities.
 

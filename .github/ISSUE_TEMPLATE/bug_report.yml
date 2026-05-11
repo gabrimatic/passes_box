@@ -1,4 +1,4 @@
-name: Bug Report
+name: Bug report
 description: Report a bug in PassesBox
 labels: ["bug"]
 body:
@@ -6,14 +6,14 @@ body:
     id: description
     attributes:
       label: Description
-      description: A clear description of the bug.
+      description: What broke, and what were you trying to do?
     validations:
       required: true
   - type: textarea
     id: steps
     attributes:
-      label: Steps to Reproduce
-      description: Minimal steps to reproduce the issue.
+      label: Steps to reproduce
+      description: Minimal steps that make the issue happen again.
       placeholder: |
         1. Open the app
         2. Tap '...'
@@ -23,15 +23,15 @@ body:
   - type: textarea
     id: expected
     attributes:
-      label: Expected Behavior
-      description: What you expected to happen.
+      label: Expected behavior
+      description: What should have happened?
     validations:
       required: true
   - type: textarea
     id: actual
     attributes:
-      label: Actual Behavior
-      description: What actually happened.
+      label: Actual behavior
+      description: What happened instead?
     validations:
       required: true
   - type: dropdown
@@ -48,14 +48,14 @@ body:
   - type: input
     id: os-version
     attributes:
-      label: OS Version
+      label: OS version
       placeholder: "e.g., Android 14, iOS 17.2, macOS 15.3"
     validations:
       required: true
   - type: input
     id: flutter-version
     attributes:
-      label: Flutter Version
+      label: Flutter version
       description: Output of `flutter --version`
       placeholder: "e.g., 3.29.3"
     validations:
@@ -64,7 +64,7 @@ body:
     id: logs
     attributes:
       label: Logs
-      description: Any relevant error output or stack traces.
+      description: Relevant error output or stack traces.
       render: shell
     validations:
       required: false

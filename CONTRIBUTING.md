@@ -1,6 +1,8 @@
 # Contributing
 
-Contributions are welcome. Open an issue first for larger changes.
+PassesBox is a small security-focused app. Good contributions keep the vault local, the behavior predictable, and the platform support honest.
+
+Open an issue first for larger changes, especially anything that touches encryption, backup formats, authentication, or storage.
 
 ## Dev Setup
 
@@ -52,16 +54,16 @@ lib/
 ## Key Conventions
 
 - State management: GetX
-- Database: sembast with AES-256 encrypted codec
+- Database: sembast with an AES-256-GCM encrypted codec
 - Platform-conditional imports for IO vs Web database factories
 - All database operations return Futures and must be awaited
 - PasswordModel equality is by database key
 
-## Running Tests
+## Checks
 
 ```bash
-flutter test
 flutter analyze
+flutter test
 ```
 
 ## Building
@@ -73,9 +75,10 @@ flutter analyze
 | macOS | `flutter build macos` |
 | Web | `flutter build web` |
 
-## PR Checklist
+## Pull Request Checklist
 
 - [ ] `flutter analyze` passes with no issues
+- [ ] `flutter test` passes
 - [ ] Tested on at least one target platform
 - [ ] No hardcoded secrets or keys
 - [ ] Commit message is one line, descriptive

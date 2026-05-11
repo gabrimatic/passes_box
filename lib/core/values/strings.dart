@@ -1,12 +1,12 @@
 const appName = 'Passes Box';
 const appVersion = '2.2.0';
 const appAbout = """
-Passes Box helps you manage all your passwords in one place.
+Passes Box keeps your passwords in an encrypted local vault.
 
-Every account you have, from social media to email to banking, gets a unique, secure password. Passes Box generates strong passwords with mixed characters (letters, numbers, and symbols), encrypts them with AES-256, and copies them to your clipboard in one touch.
+It can generate strong passwords, store TOTP secrets, keep password history, and copy credentials when you need them.
 
-Biometric authentication keeps your passwords locked behind your fingerprint or face on mobile devices.
+On mobile, biometric authentication can lock the vault behind your fingerprint or face.
 
-Copied passwords, password history entries, and TOTP codes are cleared from the clipboard after 30 seconds if they have not been replaced.
+Copied passwords, password history entries, and TOTP codes clear from the clipboard after 30 seconds if they have not been replaced.
 
-You can back up your passwords to an encrypted device backup or export a passphrase-protected portable backup for another device.""";
+You can back up the vault to an encrypted device backup or export a passphrase-protected portable backup for another device.""";

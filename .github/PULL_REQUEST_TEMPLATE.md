@@ -17,7 +17,7 @@
 
 ## User Visible Changes
 
-<!-- Describe any changes visible to end users, or "None" -->
+<!-- Describe visible user changes, or write "None". -->
 
 ## Checklist
 
@@ -28,4 +28,4 @@
 
 ## Migration Notes
 
-<!-- Delete this section if not applicable -->
+<!-- Delete this section if there is no migration. -->

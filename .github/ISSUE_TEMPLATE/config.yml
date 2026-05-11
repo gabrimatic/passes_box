@@ -2,4 +2,4 @@ blank_issues_enabled: false
 contact_links:
   - name: Discussions
     url: https://github.com/gabrimatic/passes_box/discussions
-    about: Ask questions and share ideas
+    about: Ask questions, compare approaches, or discuss an idea before opening an issue.
