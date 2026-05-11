@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Restore flows now ask before replacing the current vault.
 - CSV import now normalizes safe URLs, TOTP secrets, and imported categories.
 - Android backup/import no longer requests broad external storage permissions.
+- CI actions now use current GitHub runner-compatible versions.
 
 ### Fixed
 
