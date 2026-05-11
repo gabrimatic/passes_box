@@ -122,7 +122,8 @@ class PasswordCard extends StatelessWidget {
                   color: appColor3,
                   onPressed: () => deleteDialog(model),
                 ),
-                if (model.passwordHistory != null && model.passwordHistory!.isNotEmpty)
+                if (model.passwordHistory != null &&
+                    model.passwordHistory!.isNotEmpty)
                   IconButton(
                     icon: const Icon(Icons.history),
                     color: appColor3,
@@ -154,21 +155,23 @@ class PasswordCard extends StatelessWidget {
                       ),
                     ),
                   ],
-                  onSelected: (value) {
+                  onSelected: (value) async {
                     HapticFeedback.lightImpact();
-                    switch (value) {
-                      case 'qr_export':
-                        showQrExportDialog(model);
-                      default:
-                        final text = value == 'pass'
-                            ? (model.password ?? '')
-                            : (model.username ?? '');
-                        Clipboard.setData(ClipboardData(text: text));
-                        appShowSnackbar(
-                          message:
-                              '${value == 'pass' ? 'Password' : 'Username'} copied to clipboard.',
-                        );
+                    if (value == 'qr_export') {
+                      await showQrExportDialog(model);
+                      return;
                     }
+
+                    final isPassword = value == 'pass';
+                    await ClipboardService.copyWithAutoClear(
+                      isPassword
+                          ? (model.password ?? '')
+                          : (model.username ?? ''),
+                    );
+                    appShowSnackbar(
+                      message:
+                          '${isPassword ? 'Password' : 'Username'} copied to clipboard.',
+                    );
                   },
                 ),
               ],

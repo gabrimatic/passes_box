@@ -36,10 +36,10 @@ Web storage is inherently less secure than native platforms. The encryption key 
 
 ## What PassesBox Does Not Do
 
-- No network calls. The app is entirely offline.
+- No credential uploads. The optional HIBP breach check sends only the first 5 characters of a SHA-1 password hash to the Pwned Passwords API.
 - No analytics, telemetry, or crash reporting.
 - No cloud sync. Data stays on the device.
-- No clipboard persistence. Passwords are copied to clipboard on request; clearing is left to the OS auto-clear (30 seconds).
+- No clipboard persistence. Passwords, password history entries, and TOTP codes are cleared by the app after 30 seconds if the clipboard still contains the copied value.
 - No hardcoded keys or static nonces.
 - No unauthenticated ciphertext.
 

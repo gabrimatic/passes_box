@@ -1,5 +1,5 @@
 const appName = 'Passes Box';
-const appVersion = '2.1.0';
+const appVersion = '2.2.0';
 const appAbout = """
 Passes Box helps you manage all your passwords in one place.
 
@@ -7,4 +7,6 @@ Every account you have, from social media to email to banking, gets a unique, se
 
 Biometric authentication keeps your passwords locked behind your fingerprint or face on mobile devices.
 
-You can backup all your passwords to an encrypted .pbb file and restore them when needed.""";
+Copied passwords, password history entries, and TOTP codes are cleared from the clipboard after 30 seconds if they have not been replaced.
+
+You can back up your passwords to an encrypted device backup or export a passphrase-protected portable backup for another device.""";

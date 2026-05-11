@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Fixed
+
+- Clipboard auto-clear now applies consistently to password-card copies, password history copies, and TOTP code copies.
+- In-app version label now matches the `2.2.0` release.
+
 ## [2.2.0] - 2026-04-30
 
 ### Changed

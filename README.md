@@ -26,8 +26,9 @@ PassesBox stores credentials in an encrypted local database. It generates strong
 - Argon2id key derivation for all passphrase-protected exports (portable backup, QR)
 - Biometric authentication gate (fingerprint, Face ID) on mobile
 - Password generator (16 characters, mixed charset, cryptographically secure RNG)
+- Clipboard auto-clear for copied passwords, password history entries, and TOTP codes
 - Encrypted backup and restore via `.pbb` files (device key) and `.pbbx` files (user passphrase)
-- Offline. No network calls, no telemetry.
+- Offline by default. No telemetry. Optional HIBP breach checks use k-anonymity and never send a full password hash.
 - Cross-platform: Android, iOS, macOS, Web
 
 ---

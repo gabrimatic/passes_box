@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:otp_auth/otp_auth.dart';
 
+import '../../../core/services/clipboard_service.dart';
+
 class TotpWidget extends StatefulWidget {
   final String secret;
 
@@ -51,11 +53,14 @@ class _TotpWidgetState extends State<TotpWidget> {
     final isUrgent = _secondsRemaining <= 5;
 
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         HapticFeedback.lightImpact();
-        Clipboard.setData(ClipboardData(text: _code));
+        await ClipboardService.copyWithAutoClear(_code);
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('TOTP code copied'), duration: Duration(seconds: 2)),
+          const SnackBar(
+              content: Text('TOTP code copied'),
+              duration: Duration(seconds: 2)),
         );
       },
       child: Container(

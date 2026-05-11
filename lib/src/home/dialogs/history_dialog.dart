@@ -22,7 +22,8 @@ Future<void> showHistoryDialog(PasswordModel model) async {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
               const Spacer(),
-              IconButton(icon: const Icon(Icons.close), onPressed: appPopDialog),
+              IconButton(
+                  icon: const Icon(Icons.close), onPressed: appPopDialog),
             ],
           ),
           const Divider(),
@@ -50,7 +51,8 @@ Future<void> showHistoryDialog(PasswordModel model) async {
                 ),
                 title: Text(
                   '\u2022' * pass.length,
-                  style: const TextStyle(letterSpacing: 2, color: Colors.black54),
+                  style:
+                      const TextStyle(letterSpacing: 2, color: Colors.black54),
                 ),
                 subtitle: Text(
                   index == 0 ? 'Most recent' : '${index + 1} changes ago',
@@ -59,9 +61,9 @@ Future<void> showHistoryDialog(PasswordModel model) async {
                 trailing: IconButton(
                   icon: const Icon(Icons.copy, size: 18, color: appColor3),
                   tooltip: 'Copy',
-                  onPressed: () {
+                  onPressed: () async {
                     HapticFeedback.lightImpact();
-                    Clipboard.setData(ClipboardData(text: pass));
+                    await ClipboardService.copyWithAutoClear(pass);
                     appShowSnackbar(message: 'Old password copied.');
                   },
                 ),
