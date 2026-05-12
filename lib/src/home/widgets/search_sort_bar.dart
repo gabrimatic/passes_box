@@ -15,7 +15,7 @@ class SearchSortBar extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
           child: TextField(
             decoration: InputDecoration(
-              hintText: 'Search passwords…',
+              hintText: 'Search vault',
               prefixIcon: const Icon(Icons.search),
               suffixIcon: Obx(
                 () => controller.searchQuery.value.isNotEmpty
@@ -26,7 +26,7 @@ class SearchSortBar extends StatelessWidget {
                     : const SizedBox.shrink(),
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
               ),
               contentPadding: const EdgeInsets.symmetric(vertical: 8),
             ),
@@ -57,6 +57,7 @@ class SearchSortBar extends StatelessWidget {
               _CategoryChip(label: 'Web', value: 'web', controller: controller),
               _CategoryChip(
                   label: 'Wi-Fi', value: 'wifi', controller: controller),
+              const SizedBox(width: 4),
             ],
           ),
         ),
@@ -84,6 +85,7 @@ class _SortChip extends StatelessWidget {
         child: ChoiceChip(
           label: Text(label),
           selected: controller.sortOption.value == value,
+          showCheckmark: false,
           onSelected: (_) => controller.sortOption.value = value,
         ),
       ),
@@ -110,6 +112,7 @@ class _CategoryChip extends StatelessWidget {
         child: FilterChip(
           label: Text(label),
           selected: controller.categoryFilter.value == value,
+          showCheckmark: false,
           onSelected: (_) => controller.categoryFilter.value = value,
         ),
       ),

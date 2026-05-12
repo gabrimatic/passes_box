@@ -14,113 +14,135 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: appBackground,
         body: Obx(() {
           final controller = HomeController.to;
           final list = controller.filteredList;
 
           if (list.isNotEmpty) {
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SearchSortBar(),
-                  VaultHealthSummary(issues: controller.auditIssues),
-                  Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    alignment: WrapAlignment.center,
-                    runAlignment: WrapAlignment.center,
-                    children: list
-                        .map(
-                          (model) => Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 1,
-                              horizontal: 4,
-                            ),
-                            child: PasswordCard(model: model),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ],
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 760),
+                child: CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child:
+                          _HomeHeader(totalCount: controller.passesList.length),
+                    ),
+                    const SliverToBoxAdapter(child: SearchSortBar()),
+                    SliverToBoxAdapter(
+                      child: VaultHealthSummary(issues: controller.auditIssues),
+                    ),
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 96),
+                      sliver: SliverList.separated(
+                        itemCount: list.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        itemBuilder: (_, index) =>
+                            PasswordCard(model: list[index]),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           } else if (controller.passesList.isEmpty) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Spacer(),
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 84,
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: appSurface,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: appBorder),
                     ),
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      width: 250,
-                      color: Colors.black12,
-                    ),
-                  ),
-                ),
-                const Center(
-                  child: Text(
-                    'Passes Box',
-                    style: TextStyle(
-                      color: Colors.black12,
-                      fontSize: 28,
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'ADD YOUR FIRST PASSWORD!',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.black,
-                        letterSpacing: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.all(28),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 68,
+                            height: 68,
+                            decoration: BoxDecoration(
+                              color: appSurfaceMuted,
+                              borderRadius: BorderRadius.circular(18),
+                              border: Border.all(color: appBorder),
+                            ),
+                            child: const Icon(
+                              Icons.lock_outline_rounded,
+                              color: appColor2,
+                              size: 34,
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          const Text(
+                            'Your vault is empty',
+                            style: TextStyle(
+                              color: appTextPrimary,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Add the first credential, import a CSV, or restore an encrypted backup from settings.',
+                            style: TextStyle(
+                              color: appTextSecondary,
+                              height: 1.4,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 20),
+                          FilledButton.icon(
+                            icon: const Icon(Icons.add_rounded),
+                            label: const Text('Add password'),
+                            onPressed: () => passwordDialog(),
+                          ),
+                        ],
                       ),
                     ),
-                    Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      color: Colors.black54,
-                    ),
-                    SizedBox(height: kToolbarHeight),
-                  ],
+                  ),
                 ),
-              ],
+              ),
             );
           } else {
             return const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.search_off, size: 64, color: Colors.black12),
+                  Icon(Icons.search_off, size: 64, color: appBorder),
                   SizedBox(height: 16),
                   Text(
                     'No matches found',
-                    style: TextStyle(color: Colors.black38, fontSize: 18),
+                    style: TextStyle(color: appTextSecondary, fontSize: 18),
                   ),
                 ],
               ),
             );
           }
         }),
-        floatingActionButton: FloatingActionButton.extended(
-          icon: const Icon(
-            Icons.add,
-            color: Colors.white,
-          ),
-          label: const Text(
-            'Add password',
-            style: TextStyle(color: Colors.white),
-          ),
-          onPressed: () => passwordDialog(),
+        floatingActionButton: Obx(
+          () => HomeController.to.passesList.isEmpty
+              ? const SizedBox.shrink()
+              : FloatingActionButton.extended(
+                  icon: const Icon(
+                    Icons.add,
+                    color: Colors.white,
+                  ),
+                  label: const Text(
+                    'Add password',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () => passwordDialog(),
+                ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: BottomAppBar(
+          height: 64,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             children: [
               IconButton(
@@ -128,9 +150,64 @@ class HomePage extends StatelessWidget {
                 color: appColor3,
                 onPressed: settings,
               ),
+              const SizedBox(width: 8),
+              const Text(
+                'PassesBox',
+                style: TextStyle(
+                  color: appTextSecondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _HomeHeader extends StatelessWidget {
+  final int totalCount;
+
+  const _HomeHeader({required this.totalCount});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 18, 16, 6),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: appSurfaceMuted,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: appBorder),
+            ),
+            child: const Icon(Icons.lock_outline_rounded, color: appColor2),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'PassesBox',
+                  style: TextStyle(
+                    color: appTextPrimary,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(
+                  '$totalCount saved ${totalCount == 1 ? 'entry' : 'entries'}',
+                  style: const TextStyle(color: appTextSecondary),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

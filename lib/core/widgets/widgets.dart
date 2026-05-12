@@ -9,7 +9,7 @@ class CenterTheWidget extends StatelessWidget {
   const CenterTheWidget({
     super.key,
     required this.child,
-    this.color = const Color(0xfff8f8f8),
+    this.color = appBackground,
   });
 
   @override
@@ -20,8 +20,9 @@ class CenterTheWidget extends StatelessWidget {
     return Container(
       alignment: Alignment.center,
       width: width,
+      color: color,
       child: SizedBox(
-        width: width > 600 ? 600 : width,
+        width: width > 900 ? 900 : width,
         child: child,
       ),
     );
@@ -34,15 +35,12 @@ void appShowSnackbar({required String message}) => Get.showSnackbar(
         borderRadius: 8,
         icon: const Icon(
           Icons.info_outline,
-          color: Colors.white,
+          color: appColor2,
         ),
         duration: const Duration(seconds: 3),
-        backgroundGradient: const LinearGradient(
-          colors: [
-            appColor3,
-            appColor2,
-          ],
-        ),
+        backgroundColor: appSurface,
+        borderColor: appBorder,
+        borderWidth: 1,
         margin: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
       ),
     );

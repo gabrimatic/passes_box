@@ -52,28 +52,34 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: appBackground,
         body: Stack(
           children: [
             Align(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 20,
-                      horizontal: 84,
+                  Container(
+                    width: 82,
+                    height: 82,
+                    margin: const EdgeInsets.only(bottom: 18),
+                    decoration: BoxDecoration(
+                      color: appSurfaceMuted,
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(color: appBorder),
                     ),
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      width: 220,
+                    child: const Icon(
+                      Icons.lock_outline_rounded,
+                      color: appColor2,
+                      size: 42,
                     ),
                   ),
                   const Text(
                     'Passes Box',
                     style: TextStyle(
-                      color: appColor2,
+                      color: appTextPrimary,
                       fontSize: 28,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   if (_lockoutSecondsRemaining > 0)
@@ -82,7 +88,7 @@ class _SplashPageState extends State<SplashPage> {
                       child: Text(
                         'Too many attempts. Try again in ${_lockoutSecondsRemaining}s.',
                         style: const TextStyle(
-                          color: Colors.red,
+                          color: appDanger,
                           fontSize: 14,
                         ),
                         textAlign: TextAlign.center,
@@ -98,7 +104,7 @@ class _SplashPageState extends State<SplashPage> {
                 child: Text(
                   'Version $appVersion',
                   style: TextStyle(
-                    color: Colors.black45,
+                    color: appTextSecondary,
                     fontSize: 13,
                   ),
                 ),

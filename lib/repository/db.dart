@@ -22,6 +22,16 @@ final _store = intMapStoreFactory.store(_storeName);
 
 List<int> get encryptionKey => _encryptionKeyBytes;
 
+class VaultOpenException implements Exception {
+  final String message;
+  final Object cause;
+
+  const VaultOpenException(this.message, this.cause);
+
+  @override
+  String toString() => message;
+}
+
 // AES-256-GCM codec — authenticated encryption, 12-byte nonce, 16-byte tag.
 // Record format: nonce(12) + mac(16) + ciphertext, base64-encoded.
 class _AesGcmCodec extends AsyncContentCodecBase {
@@ -59,34 +69,54 @@ class _AesGcmCodec extends AsyncContentCodecBase {
   }
 }
 
+Future<String> _databasePath() async {
+  if (kIsWeb) return _dbName;
+
+  final dir = await getApplicationDocumentsDirectory();
+  return '${dir.path}/$_dbName';
+}
+
 Future<void> appOpenDatabase() async {
-  const secureStorage = FlutterSecureStorage();
+  try {
+    const secureStorage = FlutterSecureStorage();
 
-  String? storedKey = await secureStorage.read(key: _keyStorageKey);
-  if (storedKey == null) {
-    final random = Random.secure();
-    final keyBytes = Uint8List.fromList(
-      List<int>.generate(32, (_) => random.nextInt(256)),
+    String? storedKey = await secureStorage.read(key: _keyStorageKey);
+    if (storedKey == null) {
+      final random = Random.secure();
+      final keyBytes = Uint8List.fromList(
+        List<int>.generate(32, (_) => random.nextInt(256)),
+      );
+      storedKey = base64.encode(keyBytes);
+      await secureStorage.write(key: _keyStorageKey, value: storedKey);
+    }
+
+    _encryptionKeyBytes = base64.decode(storedKey);
+    if (_encryptionKeyBytes.length != 32) {
+      throw const FormatException('Invalid vault key length');
+    }
+
+    final dbPath = await _databasePath();
+    final codec = SembastCodec(
+      signature: 'passes_box_gcm',
+      codec: _AesGcmCodec(_encryptionKeyBytes),
     );
-    storedKey = base64.encode(keyBytes);
-    await secureStorage.write(key: _keyStorageKey, value: storedKey);
+    _db = await getDbFactory().openDatabase(dbPath, codec: codec);
+  } catch (e) {
+    throw VaultOpenException(
+      'This local vault could not be opened safely.',
+      e,
+    );
   }
+}
 
-  _encryptionKeyBytes = base64.decode(storedKey);
+Future<void> resetLocalVaultStorage() async {
+  const secureStorage = FlutterSecureStorage();
+  try {
+    await _db.close();
+  } catch (_) {}
 
-  String dbPath;
-  if (kIsWeb) {
-    dbPath = _dbName;
-  } else {
-    final dir = await getApplicationDocumentsDirectory();
-    dbPath = '${dir.path}/$_dbName';
-  }
-
-  final codec = SembastCodec(
-    signature: 'passes_box_gcm',
-    codec: _AesGcmCodec(_encryptionKeyBytes),
-  );
-  _db = await getDbFactory().openDatabase(dbPath, codec: codec);
+  await getDbFactory().deleteDatabase(await _databasePath());
+  await secureStorage.delete(key: _keyStorageKey);
 }
 
 class PassesDB {

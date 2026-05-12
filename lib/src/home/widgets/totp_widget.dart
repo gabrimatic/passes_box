@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:otp_auth/otp_auth.dart';
 
 import '../../../core/services/clipboard_service.dart';
+import '../../../core/values/colors.dart';
 
 class TotpWidget extends StatefulWidget {
   final String secret;
@@ -67,9 +68,9 @@ class _TotpWidgetState extends State<TotpWidget> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.purple.shade50,
+          color: appSurfaceMuted,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.purple.shade200),
+          border: Border.all(color: appBorder),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -80,8 +81,8 @@ class _TotpWidgetState extends State<TotpWidget> {
               child: CircularProgressIndicator(
                 value: progress,
                 strokeWidth: 2,
-                color: isUrgent ? Colors.red : Colors.purple,
-                backgroundColor: Colors.purple.shade100,
+                color: isUrgent ? appDanger : appColor2,
+                backgroundColor: appBorder,
               ),
             ),
             const SizedBox(width: 8),
@@ -91,12 +92,12 @@ class _TotpWidgetState extends State<TotpWidget> {
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 4,
-                color: isUrgent ? Colors.red : Colors.purple.shade800,
+                color: isUrgent ? appDanger : appColor3,
                 fontFamily: 'monospace',
               ),
             ),
             const SizedBox(width: 4),
-            Icon(Icons.copy, size: 14, color: Colors.purple.shade400),
+            const Icon(Icons.copy, size: 14, color: appColor2),
           ],
         ),
       ),

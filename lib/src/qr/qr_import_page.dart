@@ -114,7 +114,7 @@ class _QrImportPageState extends State<QrImportPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.check_circle, color: Colors.green, size: 48),
+                  const Icon(Icons.check_circle, color: appSuccess, size: 48),
                   const SizedBox(height: 8),
                   const Text(
                       'QR code scanned. Enter the passphrase to decrypt:',
@@ -128,7 +128,7 @@ class _QrImportPageState extends State<QrImportPage> {
                   ),
                   if (_errorMsg != null) ...[
                     const SizedBox(height: 8),
-                    Text(_errorMsg!, style: const TextStyle(color: Colors.red)),
+                    Text(_errorMsg!, style: const TextStyle(color: appDanger)),
                   ],
                   const SizedBox(height: 16),
                   SizedBox(

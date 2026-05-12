@@ -45,7 +45,7 @@ class CredentialPolicy {
       issues.add('Password is required.');
     }
     if (url != null && url.trim().isNotEmpty && normalizeUrl(url) == null) {
-      issues.add('URL must start with http:// or https://.');
+      issues.add('URL must use http://, https://, or a bare domain.');
     }
     if (totpSecret != null &&
         totpSecret.trim().isNotEmpty &&
@@ -76,11 +76,23 @@ class CredentialPolicy {
     if (raw == null || raw.isEmpty) return null;
 
     String secret;
-    if (raw.startsWith('otpauth://')) {
+    if (raw.toLowerCase().startsWith('otpauth://')) {
       try {
         secret = OTPUri.extractSecret(raw);
       } catch (_) {
-        return null;
+        final uri = Uri.tryParse(raw);
+        String? querySecret;
+        final queryEntries = uri?.queryParameters.entries;
+        if (queryEntries != null) {
+          for (final entry in queryEntries) {
+            if (entry.key.toLowerCase() == 'secret') {
+              querySecret = entry.value;
+              break;
+            }
+          }
+        }
+        if (querySecret == null || querySecret.isEmpty) return null;
+        secret = querySecret;
       }
     } else {
       secret = raw;

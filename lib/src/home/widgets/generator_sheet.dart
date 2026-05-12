@@ -234,16 +234,16 @@ class _GeneratorSheetState extends State<GeneratorSheet> {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: appSurfaceMuted,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade300),
+              border: Border.all(color: appBorder),
             ),
             child: Text(
               _error ?? _generated,
               style: TextStyle(
                 fontSize: 16,
                 fontFamily: _error == null ? 'monospace' : null,
-                color: _error == null ? null : Colors.red,
+                color: _error == null ? appTextPrimary : appDanger,
               ),
               textAlign: TextAlign.center,
             ),
@@ -253,7 +253,7 @@ class _GeneratorSheetState extends State<GeneratorSheet> {
           if (!_passphraseMode) ...[
             LinearProgressIndicator(
               value: score,
-              backgroundColor: Colors.grey.shade200,
+              backgroundColor: appBorder,
               valueColor:
                   AlwaysStoppedAnimation(PasswordStrengthUtil.color(strength)),
             ),

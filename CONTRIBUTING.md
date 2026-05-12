@@ -37,6 +37,8 @@ lib/
 │   ├── db_factory_io.dart
 │   └── db_factory_web.dart
 └── src/
+    ├── startup/
+    │   └── vault_recovery_page.dart # Recovery when local vault storage cannot open
     ├── splash/
     │   └── view/page.dart       # Biometric auth gate
     ├── home/
@@ -66,7 +68,7 @@ flutter analyze
 flutter test
 ```
 
-CI runs both commands before Android and Web builds. Changes to credential parsing, generation, validation, restore behavior, or clipboard handling should include focused tests for the behavior being changed.
+CI runs both commands before Android and Web builds. Tagged release builds run the same verification before packaging Android, Web, macOS, and Windows artifacts. Changes to credential parsing, generation, validation, restore behavior, or clipboard handling should include focused tests for the behavior being changed.
 
 ## Building
 

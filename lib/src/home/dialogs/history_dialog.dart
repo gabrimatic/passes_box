@@ -32,7 +32,7 @@ Future<void> showHistoryDialog(PasswordModel model) async {
               padding: EdgeInsets.all(16),
               child: Text(
                 'No previous passwords recorded.',
-                style: TextStyle(color: Colors.black38),
+                style: TextStyle(color: appTextSecondary),
               ),
             )
           else
@@ -51,8 +51,10 @@ Future<void> showHistoryDialog(PasswordModel model) async {
                 ),
                 title: Text(
                   '\u2022' * pass.length,
-                  style:
-                      const TextStyle(letterSpacing: 2, color: Colors.black54),
+                  style: const TextStyle(
+                    letterSpacing: 2,
+                    color: appTextSecondary,
+                  ),
                 ),
                 subtitle: Text(
                   index == 0 ? 'Most recent' : '${index + 1} changes ago',
@@ -74,10 +76,10 @@ Future<void> showHistoryDialog(PasswordModel model) async {
       ),
     ),
     isScrollControlled: true,
-    backgroundColor: Colors.white,
+    backgroundColor: appSurface,
     shape: const OutlineInputBorder(
       borderSide: BorderSide.none,
-      borderRadius: BorderRadius.only(topRight: Radius.circular(32)),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
     ),
   );
 }

@@ -28,10 +28,10 @@ class VaultHealthSummary extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
       child: Material(
-        color: issues.isEmpty ? Colors.green.shade50 : Colors.orange.shade50,
-        borderRadius: BorderRadius.circular(8),
+        color: issues.isEmpty ? appSuccessSurface : appWarningSurface,
+        borderRadius: BorderRadius.circular(14),
         child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(14),
           onTap: issues.isEmpty ? null : () => _showIssues(context, issues),
           child: Padding(
             padding: const EdgeInsets.all(12),
@@ -44,7 +44,7 @@ class VaultHealthSummary extends StatelessWidget {
                       issues.isEmpty
                           ? Icons.verified_user_outlined
                           : Icons.health_and_safety_outlined,
-                      color: issues.isEmpty ? Colors.green : Colors.orange,
+                      color: issues.isEmpty ? appSuccess : appWarning,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -93,7 +93,7 @@ class VaultHealthSummary extends StatelessWidget {
     Get.bottomSheet(
       SafeArea(
         child: Material(
-          color: Colors.white,
+          color: appSurface,
           child: ListView.separated(
             shrinkWrap: true,
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
@@ -131,8 +131,8 @@ class VaultHealthSummary extends StatelessWidget {
                       ? Icons.warning_rounded
                       : Icons.schedule_rounded,
                   color: issue.severity == CredentialIssueSeverity.danger
-                      ? Colors.red
-                      : Colors.orange,
+                      ? appDanger
+                      : appWarning,
                 ),
                 title: Text(issue.title),
                 subtitle: Text(issue.detail),
@@ -149,10 +149,10 @@ class VaultHealthSummary extends StatelessWidget {
         ),
       ),
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: appSurface,
       shape: const OutlineInputBorder(
         borderSide: BorderSide.none,
-        borderRadius: BorderRadius.only(topRight: Radius.circular(32)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
       ),
     );
   }

@@ -404,12 +404,10 @@ Future<void> passwordDialog({
   Get.bottomSheet(
     SingleChildScrollView(child: widget),
     isScrollControlled: true,
-    backgroundColor: Colors.white,
+    backgroundColor: appSurface,
     shape: const OutlineInputBorder(
       borderSide: BorderSide.none,
-      borderRadius: BorderRadius.only(
-        topRight: Radius.circular(32),
-      ),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
     ),
   );
 }
@@ -446,7 +444,7 @@ Future<bool> _confirmDuplicatePassword() async {
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.orange,
+            backgroundColor: appWarning,
             foregroundColor: Colors.white,
           ),
           onPressed: () => Navigator.of(context).pop(true),
@@ -517,7 +515,7 @@ Future<void> settings() async {
               subtitle: canUseAuth
                   ? (hasAuth
                       ? const Text('PassesBox is using biometric auth.')
-                      : const Text('Tap here to active biometric auth.'))
+                      : const Text('Tap here to activate biometric auth.'))
                   : const Text('Your device does not support biometric auth.'),
               trailing: (canUseAuth && hasAuth)
                   ? IconButton(
@@ -621,12 +619,10 @@ Future<void> settings() async {
       ),
     ),
     isScrollControlled: true,
-    backgroundColor: Colors.white,
+    backgroundColor: appSurface,
     shape: const OutlineInputBorder(
       borderSide: BorderSide.none,
-      borderRadius: BorderRadius.only(
-        topRight: Radius.circular(32),
-      ),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
     ),
   );
 }

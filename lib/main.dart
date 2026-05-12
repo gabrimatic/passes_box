@@ -18,7 +18,12 @@ Future<void> main() async {
     usePathUrlStrategy();
   }
 
-  await appOpenDatabase();
+  VaultOpenException? startupIssue;
+  try {
+    await appOpenDatabase();
+  } on VaultOpenException catch (e) {
+    startupIssue = e;
+  }
   appSH = await SharedPreferences.getInstance();
 
   Get.put(LockService(), permanent: true);
@@ -29,5 +34,5 @@ Future<void> main() async {
     ),
   );
 
-  runApp(const CenterTheWidget(child: PassesBoxApp()));
+  runApp(CenterTheWidget(child: PassesBoxApp(startupIssue: startupIssue)));
 }

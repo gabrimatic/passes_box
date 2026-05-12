@@ -2,7 +2,7 @@ name: passes_box
 description: Local password manager with AES-256-GCM encryption, biometric auth, and encrypted backups for Android, iOS, macOS, and Web.
 homepage: https://github.com/gabrimatic/passes_box
 
-version: 2.2.0+4
+version: 2.3.0+5
 
 environment:
   sdk: ">=3.3.0 <4.0.0"

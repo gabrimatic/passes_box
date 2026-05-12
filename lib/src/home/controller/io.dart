@@ -86,7 +86,7 @@ Future<void> restore() async {
     textConfirm: 'Replace',
     textCancel: 'Cancel',
     confirmTextColor: Colors.white,
-    buttonColor: Colors.red,
+    buttonColor: appDanger,
     onConfirm: () => Get.back(result: true),
     onCancel: () => Get.back(result: false),
   );
@@ -198,8 +198,9 @@ Future<void> exportPortable() async {
     );
 
     appShowSnackbar(message: 'Portable backup exported successfully.');
-  } catch (e) {
-    appShowSnackbar(message: 'Export failed: $e');
+  } catch (_) {
+    appShowSnackbar(
+        message: 'Export failed. Try again with a valid backup destination.');
   }
 }
 
@@ -276,7 +277,7 @@ Future<void> restorePortable() async {
       textConfirm: 'Replace',
       textCancel: 'Cancel',
       confirmTextColor: Colors.white,
-      buttonColor: Colors.red,
+      buttonColor: appDanger,
       onConfirm: () => Get.back(result: true),
       onCancel: () => Get.back(result: false),
     );
@@ -288,9 +289,9 @@ Future<void> restorePortable() async {
     HomeController.to.loadAll();
     appShowSnackbar(
         message: 'Portable backup restored: ${list.length} entries.');
-    Get.back();
-  } catch (e) {
-    appShowSnackbar(message: 'Restore failed: $e');
+  } catch (_) {
+    appShowSnackbar(
+        message: 'Restore failed. Try again with a valid portable backup.');
   }
 }
 
@@ -328,9 +329,9 @@ Future<void> importCsv() async {
     await PassesDB.insertAll(models);
     HomeController.to.loadAll();
     appShowSnackbar(message: 'Imported ${models.length} entries from CSV.');
-    Get.back();
-  } catch (e) {
-    appShowSnackbar(message: 'Import failed: $e');
+  } catch (_) {
+    appShowSnackbar(
+        message: 'Import failed. Check the CSV format and try again.');
   }
 }
 

@@ -44,11 +44,12 @@ class _RecycleBinPageState extends State<RecycleBinPage> {
   Future<void> _permanentDelete(PasswordModel model) async {
     final confirmed = await Get.defaultDialog<bool>(
       title: 'Delete Permanently',
-      content: Text('Permanently delete "${model.title}"? This cannot be undone.'),
+      content:
+          Text('Permanently delete "${model.title}"? This cannot be undone.'),
       textConfirm: 'Delete',
       textCancel: 'Cancel',
       confirmTextColor: Colors.white,
-      buttonColor: Colors.red,
+      buttonColor: appDanger,
       onConfirm: () => Get.back(result: true),
       onCancel: () => Get.back(result: false),
     );
@@ -86,11 +87,13 @@ class _RecycleBinPageState extends State<RecycleBinPage> {
               onPressed: () async {
                 final confirmed = await Get.defaultDialog<bool>(
                   title: 'Empty Recycle Bin',
-                  content: const Text('Permanently delete all items in the recycle bin?'),
+                  content: const Text(
+                    'Permanently delete all items in the recycle bin?',
+                  ),
                   textConfirm: 'Delete All',
                   textCancel: 'Cancel',
                   confirmTextColor: Colors.white,
-                  buttonColor: Colors.red,
+                  buttonColor: appDanger,
                   onConfirm: () => Get.back(result: true),
                   onCancel: () => Get.back(result: false),
                 );
@@ -101,7 +104,7 @@ class _RecycleBinPageState extends State<RecycleBinPage> {
                   setState(() => _deleted.clear());
                 }
               },
-              child: const Text('Empty', style: TextStyle(color: Colors.red)),
+              child: const Text('Empty', style: TextStyle(color: appDanger)),
             ),
         ],
       ),
@@ -112,16 +115,16 @@ class _RecycleBinPageState extends State<RecycleBinPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.delete_outline, size: 64, color: Colors.black12),
+                      Icon(Icons.delete_outline, size: 64, color: appBorder),
                       SizedBox(height: 16),
                       Text(
                         'Recycle bin is empty',
-                        style: TextStyle(color: Colors.black38, fontSize: 18),
+                        style: TextStyle(color: appTextSecondary, fontSize: 18),
                       ),
                       SizedBox(height: 8),
                       Text(
                         'Deleted items are kept for 30 days',
-                        style: TextStyle(color: Colors.black26, fontSize: 14),
+                        style: TextStyle(color: appTextSecondary, fontSize: 14),
                       ),
                     ],
                   ),
@@ -147,12 +150,15 @@ class _RecycleBinPageState extends State<RecycleBinPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.restore, color: Colors.green),
+                            icon: const Icon(Icons.restore, color: appSuccess),
                             tooltip: 'Restore',
                             onPressed: () => _restore(model),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.delete_forever, color: Colors.red),
+                            icon: const Icon(
+                              Icons.delete_forever,
+                              color: appDanger,
+                            ),
                             tooltip: 'Delete permanently',
                             onPressed: () => _permanentDelete(model),
                           ),

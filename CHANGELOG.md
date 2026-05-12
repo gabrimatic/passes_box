@@ -6,12 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-05-12
+
 ### Added
 
 - Vault health summary on the home screen for weak, reused, and old passwords.
 - Shared credential policy for title, URL, TOTP, export passphrase, and vault audit checks.
 - Tested CSV import parser for common Chrome, Bitwarden, 1Password, and generic column names.
-- CI now runs `flutter test` before release builds.
+- Focused tests now cover credential policy, CSV import, password generation, search, and password dialog flows.
 
 ### Changed
 
@@ -21,12 +23,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Restore flows now ask before replacing the current vault.
 - CSV import now normalizes safe URLs, TOTP secrets, and imported categories.
 - Android backup/import no longer requests broad external storage permissions.
+- Web builds now use packaged CanvasKit assets and remove the loading screen after the first Flutter frame.
+- The app now shows a vault recovery screen instead of hanging when a local vault uses an incompatible encryption format.
+- Home, cards, search, health, TOTP, empty, splash, and recovery surfaces now use a quieter password-manager UI palette.
+- Release builds now run `flutter analyze` and `flutter test` before packaging Android, Web, macOS, or Windows artifacts.
 - CI actions now use current GitHub runner-compatible versions.
 
 ### Fixed
 
 - Clipboard auto-clear now covers password-card copies, password history copies, and TOTP code copies.
-- In-app version label now matches the `2.2.0` release.
+- In-app version label now matches the `2.3.0` release.
 - Editing a password now records the previous password in password history again.
 - Password age warnings now use the last password update time instead of only the entry creation time.
 

@@ -74,7 +74,7 @@ Future<void> showQrExportDialog(PasswordModel model) async {
                 if (errorMsg != null) ...[
                   const SizedBox(height: 8),
                   Text(errorMsg!,
-                      style: const TextStyle(color: Colors.red, fontSize: 12)),
+                      style: const TextStyle(color: appDanger, fontSize: 12)),
                 ],
                 const SizedBox(height: 16),
                 SizedBox(
@@ -133,10 +133,10 @@ Future<void> showQrExportDialog(PasswordModel model) async {
       },
     ),
     isScrollControlled: true,
-    backgroundColor: Colors.white,
+    backgroundColor: appSurface,
     shape: const OutlineInputBorder(
       borderSide: BorderSide.none,
-      borderRadius: BorderRadius.only(topRight: Radius.circular(32)),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
     ),
   );
 }

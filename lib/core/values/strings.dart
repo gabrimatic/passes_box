@@ -1,5 +1,5 @@
 const appName = 'Passes Box';
-const appVersion = '2.2.0';
+const appVersion = '2.3.0';
 const appAbout = """
 Passes Box keeps your passwords in an encrypted local vault.
 

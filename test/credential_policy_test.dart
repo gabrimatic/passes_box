@@ -21,6 +21,12 @@ void main() {
       ),
       'JBSWY3DPEHPK3PXP',
     );
+    expect(
+      CredentialPolicy.normalizeTotpSecret(
+        'OTPAUTH://totp/Example?SECRET=jbswy3dpehpk3pxp',
+      ),
+      'JBSWY3DPEHPK3PXP',
+    );
   });
 
   test('validates required fields and malformed TOTP secrets', () {

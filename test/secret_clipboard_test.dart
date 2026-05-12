@@ -44,7 +44,7 @@ void main() {
   });
 
   test('app version matches the current release', () {
-    expect(appVersion, '2.2.0');
+    expect(appVersion, '2.3.0');
   });
 
   testWidgets('password card copy clears the clipboard after the timeout',
