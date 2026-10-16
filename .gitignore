@@ -47,3 +47,7 @@ app.*.map.json
 *.keystore
 android/local.properties
 .review/
+
+# Local Android SDK path, machine specific
+/local.properties
+local.properties
