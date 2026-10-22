@@ -14,10 +14,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17
-    }
-
     defaultConfig {
         applicationId = "gabrimatic.info.passesbox"
         minSdkVersion = flutter.minSdkVersion
@@ -30,6 +26,12 @@ android {
         release {
             signingConfig = signingConfigs.debug
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
 
